@@ -16,3 +16,10 @@ export type MidPoints = {
   bottom: Point
   right: Point
 }
+
+export type Node = {
+  id: number
+  parents: Set<number>
+}
+
+export type Graph = Map<number, Set<number>>

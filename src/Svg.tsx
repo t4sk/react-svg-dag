@@ -33,9 +33,7 @@ export const SvgLine: React.FC<{
   x1: number
   y1: number
 }> = ({ x0, y0, x1, y1 }) => {
-  return (
-    <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="black" stroke-width="2" />
-  )
+  return <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="black" strokeWidth="2" />
 }
 
 export const SvgCubicBezier: React.FC<{
