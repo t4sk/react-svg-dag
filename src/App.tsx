@@ -43,6 +43,19 @@ console.log(dag.group(g, 1))
 // TODO: zoom
 // TODO: drag
 const SvgGraph: React.FC = () => {
+  const width = 200
+  const height = 100
+
+  const graph = dag.build(data)
+  console.log("--- dfs ---")
+  console.log(
+    dag.dfs(graph, 1, (path) => {
+      console.log(path)
+    }),
+  )
+  const rows = dag.group(graph, 1)
+  console.log("rows", rows)
+
   const r0: Rect = {
     x: 10,
     y: 20,
@@ -59,6 +72,18 @@ const SvgGraph: React.FC = () => {
 
   const m0 = svg.iter(svg.getMidPoints(r0))
   const m1 = svg.iter(svg.getMidPoints(r1))
+
+  const layout = svg.map(graph, {
+    canvas: {
+      width: 800,
+      height: 600,
+    },
+    node: {
+      width: 200,
+      height: 100,
+      gap: 40,
+    },
+  })
 
   return (
     <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
@@ -84,6 +109,17 @@ const SvgGraph: React.FC = () => {
         y1={m1[0].y}
         t={0.1}
       />
+
+      <SvgRect
+        x={layout.rect.x}
+        y={layout.rect.y}
+        width={layout.rect.width}
+        height={layout.rect.height}
+        fill="transparent"
+      />
+      {svg.iter(layout.mid).map((p, i) => (
+        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
+      ))}
     </svg>
   )
 }

@@ -6,14 +6,15 @@ export const SvgRect: React.FC<{
   y: number
   width: number
   height: number
-}> = ({ x, y, width, height }) => {
+  fill?: string
+}> = ({ x, y, width, height, fill = "blue" }) => {
   return (
     <rect
       x={x}
       y={y}
       width={width}
       height={height}
-      fill="blue"
+      fill={fill}
       stroke="black"
       strokeWidth="2"
     />
