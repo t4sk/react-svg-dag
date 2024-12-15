@@ -29,6 +29,10 @@ export function getMidPoints(rect: Rect): MidPoints {
       x: rect.x + rect.width,
       y: rect.y + midHeight,
     },
+    center: {
+      x: rect.x + midWidth,
+      y: rect.y + midHeight,
+    },
   }
 }
 
@@ -37,8 +41,9 @@ export function iter(mids: {
   bottom: Point
   left: Point
   right: Point
+  center: Point
 }): Point[] {
-  const { top, left, bottom, right } = mids
+  const { top, left, bottom, right, center } = mids
   // clockwise
-  return [top, left, bottom, right]
+  return [top, left, bottom, right, center]
 }

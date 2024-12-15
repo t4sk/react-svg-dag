@@ -1,63 +1,5 @@
 import { Node, Graph } from "./types"
 
-const data: Node[] = [
-  {
-    id: 1,
-    parents: new Set([]),
-  },
-  {
-    id: 2,
-    parents: new Set([1]),
-  },
-  {
-    id: 3,
-    parents: new Set([1, 2]),
-  },
-  {
-    id: 4,
-    parents: new Set([2]),
-  },
-  {
-    id: 5,
-    parents: new Set([3]),
-  },
-]
-// 1 -> 2 -> 4
-// 1 -> 2 -> 3 -> 5
-// 1 -> 3 -> 5
-
-const g = build(data)
-console.log("g", g)
-console.log("--- dfs ---")
-console.log(dfs(g, 1, (path) => console.log(path)))
-console.log("--- bfs ---")
-const rows: number[][] = []
-bfs(g, 1, (i, vs) => {
-  console.log(i, vs)
-  rows.push([...vs])
-})
-
-console.log(rows)
-
-const vs: number[][] = []
-const inserted: Set<number> = new Set()
-
-for (const row of rows) {
-  const r = []
-  for (const v of row) {
-    if (inserted.has(v)) {
-      continue
-    }
-    inserted.add(v)
-    r.push(v)
-  }
-  if (r.length > 0) {
-    vs.push(r)
-  }
-}
-
-console.log(vs)
-
 // Node[] -> build graph -> check valid DAG -> organize into levels
 export function build(nodes: Node[]): Graph {
   let graph: Graph = new Map()
@@ -137,7 +79,7 @@ export function bfs(
   while (q.length > 0) {
     const vs = q.pop() as number[]
 
-    f(i, vs)
+    f(i, [...vs])
 
     const row: Set<number> = new Set()
     for (const v of vs) {
@@ -163,5 +105,31 @@ export function bfs(
   }
 }
 
-// Topological sort
-export function sort() {}
+export function group(graph: Graph, start: number): number[][] {
+  const rows: number[][] = []
+
+  bfs(graph, start, (_, vs) => {
+    rows.push(vs)
+  })
+
+  const vs: number[][] = []
+  const inserted: Set<number> = new Set()
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    const r = []
+    for (let j = 0; j < row.length; j++) {
+      const v = row[j]
+      if (inserted.has(v)) {
+        continue
+      }
+      inserted.add(v)
+      r.push(v)
+    }
+    if (r.length > 0) {
+      vs.push(r)
+    }
+  }
+
+  return vs
+}

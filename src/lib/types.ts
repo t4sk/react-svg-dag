@@ -15,6 +15,7 @@ export type MidPoints = {
   left: Point
   bottom: Point
   right: Point
+  center: Point
 }
 
 export type Node = {

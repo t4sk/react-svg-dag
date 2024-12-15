@@ -4,7 +4,40 @@ import * as dag from "./lib/dag"
 import { Rect } from "./lib/types"
 import { SvgRect, SvgLine, SvgDot, SvgCubicBezier } from "./Svg"
 
-console.log(dag)
+import { Node } from "./lib/types"
+
+const data: Node[] = [
+  {
+    id: 1,
+    parents: new Set([]),
+  },
+  {
+    id: 2,
+    parents: new Set([1]),
+  },
+  {
+    id: 3,
+    parents: new Set([1, 2]),
+  },
+  {
+    id: 4,
+    parents: new Set([2]),
+  },
+  {
+    id: 5,
+    parents: new Set([3]),
+  },
+]
+// 1 -> 2 -> 4
+// 1 -> 2 -> 3 -> 5
+// 1 -> 3 -> 5
+
+const g = dag.build(data)
+console.log("g", g)
+console.log("--- dfs ---")
+console.log(dag.dfs(g, 1, (path) => console.log(path)))
+console.log("--- bfs ---")
+console.log(dag.group(g, 1))
 
 // TODO: view box
 // TODO: zoom
