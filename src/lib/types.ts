@@ -18,6 +18,20 @@ export type MidPoints = {
   center: Point
 }
 
+export type Canvas = {
+  width: number
+  height: number
+  center: Point
+  node: { width: number; height: number; gap: number }
+}
+
+export type Layout = {
+  rect: Rect
+  mid: MidPoints
+  nodes: Rect[][]
+  boxes: Rect[]
+}
+
 export type Node = {
   id: number
   parents: Set<number>

@@ -74,9 +74,11 @@ const SvgGraph: React.FC = () => {
   const m1 = svg.iter(svg.getMidPoints(r1))
 
   const layout = svg.map(graph, {
-    canvas: {
-      width: 800,
-      height: 600,
+    width: 800,
+    height: 600,
+    center: {
+      x: 400,
+      y: 300,
     },
     node: {
       width: 200,
@@ -84,6 +86,8 @@ const SvgGraph: React.FC = () => {
       gap: 40,
     },
   })
+
+  console.log("LAYOUT", layout)
 
   return (
     <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
@@ -120,6 +124,27 @@ const SvgGraph: React.FC = () => {
       {svg.iter(layout.mid).map((p, i) => (
         <SvgDot x={p.x} y={p.y} key={i} radius={4} />
       ))}
+      {layout.boxes.map((b, i) => (
+        <SvgRect
+          key={i}
+          x={b.x}
+          y={b.y}
+          width={b.width}
+          height={b.height}
+          fill="transparent"
+        />
+      ))}
+      {layout.nodes.map((row, i) => {
+        return row.map((node, j) => (
+          <SvgRect
+            key={j}
+            x={node.x}
+            y={node.y}
+            width={node.width}
+            height={node.height}
+          />
+        ))
+      })}
     </svg>
   )
 }

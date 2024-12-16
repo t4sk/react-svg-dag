@@ -1,5 +1,6 @@
-import { Point, Rect, MidPoints, Graph } from "./types"
+import { Point, Rect, MidPoints, Canvas, Layout, Graph } from "./types"
 import * as dag from "./dag"
+import * as math from "./math"
 
 export function getCenterX(rect: Rect): number {
   return rect.x + (rect.width >> 1)
@@ -56,46 +57,66 @@ export function iter(mids: {
   return [top, left, bottom, right, center]
 }
 
-export type Layout = {
-  rect: Rect
-  mid: MidPoints
-  nodes: Rect[][]
+export function box(canvas: Canvas, n: number, p0: Point): Rect {
+  const height = canvas.node.height
+  const width = n * canvas.node.width + (n - 1) * canvas.node.gap
+
+  return {
+    x: p0.x - (width >> 1),
+    y: p0.y - (height >> 1),
+    width,
+    height,
+  }
 }
 
-export function map(
-  graph: Graph,
-  params: {
-    canvas: { width: number; height: number }
-    node: { width: number; height: number; gap: number }
-  },
-): Layout {
-  // TODO: start from input
+// TODO: start from input
+export function map(graph: Graph, canvas: Canvas): Layout {
   const rows = dag.group(graph, 1)
-  const maxRowLen = Math.max(...rows.map((r) => r.length))
-  const height =
-    rows.length * params.node.height + (rows.length - 1) * params.node.gap
-  const width =
-    maxRowLen * params.node.width + (maxRowLen - 1) * params.node.gap
 
-  const center = getCenter({
-    x: 0,
-    y: 0,
-    width: params.canvas.width,
-    height: params.canvas.height,
-  })
+  const height =
+    rows.length * canvas.node.height + (rows.length - 1) * canvas.node.gap
+  const y0 = canvas.center.y - (height >> 1)
+
+  const boxes = rows.map((r, i) =>
+    box(canvas, r.length, {
+      x: canvas.center.x,
+      y:
+        y0 +
+        (canvas.node.height >> 1) +
+        i * (canvas.node.height + canvas.node.gap),
+    }),
+  )
+
+  const width = Math.max(...boxes.map((b) => b.width))
 
   const rect = {
-    x: center.x - (width >> 1),
-    y: center.y - (height >> 1),
+    x: canvas.center.x - (width >> 1),
+    y: canvas.center.y - (height >> 1),
     width,
     height,
   }
 
   const mid = getMidPoints(rect)
 
+  const nodes: Rect[][] = []
+  for (let i = 0; i < rows.length; i++) {
+    const row: Rect[] = []
+    const box = boxes[i]
+    for (let j = 0; j < rows[i].length; j++) {
+      row.push({
+        x: box.x + j * (canvas.node.width + canvas.node.gap),
+        y: box.y,
+        width: canvas.node.width,
+        height: canvas.node.height,
+      })
+    }
+    nodes.push(row)
+  }
+
   return {
     rect,
     mid,
-    nodes: [],
+    nodes,
+    boxes,
   }
 }
