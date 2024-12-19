@@ -27,6 +27,14 @@ const data: Node[] = [
     id: 5,
     parents: new Set([3]),
   },
+  {
+    id: 6,
+    parents: new Set([3]),
+  },
+  {
+    id: 7,
+    parents: new Set([4]),
+  },
 ]
 // 1 -> 2 -> 4
 // 1 -> 2 -> 3 -> 5
@@ -43,19 +51,6 @@ console.log(dag.group(g, 1))
 // TODO: zoom
 // TODO: drag
 const SvgGraph: React.FC = () => {
-  const width = 200
-  const height = 100
-
-  const graph = dag.build(data)
-  console.log("--- dfs ---")
-  console.log(
-    dag.dfs(graph, 1, (path) => {
-      console.log(path)
-    }),
-  )
-  const rows = dag.group(graph, 1)
-  console.log("rows", rows)
-
   const r0: Rect = {
     x: 10,
     y: 20,
@@ -72,6 +67,16 @@ const SvgGraph: React.FC = () => {
 
   const m0 = svg.iter(svg.getMidPoints(r0))
   const m1 = svg.iter(svg.getMidPoints(r1))
+
+  const graph = dag.build(data)
+  console.log("--- dfs ---")
+  console.log(
+    dag.dfs(graph, 1, (path) => {
+      console.log(path)
+    }),
+  )
+  const rows = dag.group(graph, 1)
+  console.log("rows", rows)
 
   const layout = svg.map(graph, {
     width: 800,
@@ -124,7 +129,7 @@ const SvgGraph: React.FC = () => {
       {svg.iter(layout.mid).map((p, i) => (
         <SvgDot x={p.x} y={p.y} key={i} radius={4} />
       ))}
-      {layout.boxes.map((b, i) => (
+      {/*layout.boxes.map((b, i) => (
         <SvgRect
           key={i}
           x={b.x}
@@ -133,7 +138,7 @@ const SvgGraph: React.FC = () => {
           height={b.height}
           fill="transparent"
         />
-      ))}
+      ))*/}
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
           <SvgRect

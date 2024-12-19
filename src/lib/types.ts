@@ -4,6 +4,8 @@ export type Point = {
 }
 
 export type Rect = {
+  // Node id
+  id?: number
   x: number
   y: number
   width: number

@@ -70,6 +70,7 @@ export function box(canvas: Canvas, n: number, p0: Point): Rect {
 }
 
 // TODO: start from input
+// TODO: box layout
 export function map(graph: Graph, canvas: Canvas): Layout {
   const rows = dag.group(graph, 1)
 
@@ -104,6 +105,7 @@ export function map(graph: Graph, canvas: Canvas): Layout {
     const box = boxes[i]
     for (let j = 0; j < rows[i].length; j++) {
       row.push({
+        id: rows[i][j],
         x: box.x + j * (canvas.node.width + canvas.node.gap),
         y: box.y,
         width: canvas.node.width,
