@@ -1,12 +1,12 @@
 import { useRef, useEffect } from "react"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
-import { Rect } from "./lib/types"
+import { Rect, Arrow } from "./lib/types"
 import { SvgRect, SvgLine, SvgDot, SvgCubicBezier } from "./Svg"
 
 import { Node } from "./lib/types"
 
-const data: Node[] = [
+const nodes: Node[] = [
   {
     id: 1,
     parents: new Set([]),
@@ -29,7 +29,7 @@ const data: Node[] = [
   },
   {
     id: 6,
-    parents: new Set([3]),
+    parents: new Set([3, 4]),
   },
   {
     id: 7,
@@ -40,7 +40,7 @@ const data: Node[] = [
 // 1 -> 2 -> 3 -> 5
 // 1 -> 3 -> 5
 
-const g = dag.build(data)
+const g = dag.build(nodes)
 console.log("g", g)
 console.log("--- dfs ---")
 console.log(dag.dfs(g, 1, (path) => console.log(path)))
@@ -68,7 +68,7 @@ const SvgGraph: React.FC = () => {
   const m0 = svg.iter(svg.getMidPoints(r0))
   const m1 = svg.iter(svg.getMidPoints(r1))
 
-  const graph = dag.build(data)
+  const graph = dag.build(nodes)
   console.log("--- dfs ---")
   console.log(
     dag.dfs(graph, 1, (path) => {
@@ -93,6 +93,18 @@ const SvgGraph: React.FC = () => {
   })
 
   console.log("LAYOUT", layout)
+
+  const arrows: Arrow[] = []
+  nodes.map((node) => {
+    const s = node.id
+    const es = graph.get(s)
+    if (es) {
+      for (const e of es) {
+        const arrow = svg.getEdge(layout, s, e)
+        arrows.push(arrow)
+      }
+    }
+  })
 
   return (
     <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
@@ -139,14 +151,31 @@ const SvgGraph: React.FC = () => {
           fill="transparent"
         />
       ))*/}
+      {arrows.map((e, i) => {
+        if (e.start.y == e.end.y) {
+          return (
+            <SvgLine x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
+          )
+        }
+        return (
+          <SvgCubicBezier
+            key={i}
+            x0={e.start.x}
+            y0={e.start.y}
+            x1={e.end.x}
+            y1={e.end.y}
+            t={0.1}
+          />
+        )
+      })}
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
           <SvgRect
             key={j}
-            x={node.x}
-            y={node.y}
-            width={node.width}
-            height={node.height}
+            x={node.rect.x}
+            y={node.rect.y}
+            width={node.rect.width}
+            height={node.rect.height}
           />
         ))
       })}

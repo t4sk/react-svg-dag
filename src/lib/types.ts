@@ -1,15 +1,27 @@
+// DAG
+export type Node = {
+  id: number
+  parents: Set<number>
+}
+
+export type Graph = Map<number, Set<number>>
+
+// SVG
 export type Point = {
   x: number
   y: number
 }
 
 export type Rect = {
-  // Node id
-  id?: number
   x: number
   y: number
   width: number
   height: number
+}
+
+export type Arrow = {
+  start: Point
+  end: Point
 }
 
 export type MidPoints = {
@@ -27,16 +39,16 @@ export type Canvas = {
   node: { width: number; height: number; gap: number }
 }
 
+export type SvgNode = {
+  // Node id
+  id: number
+  rect: Rect
+}
+
 export type Layout = {
   rect: Rect
   mid: MidPoints
-  nodes: Rect[][]
   boxes: Rect[]
+  nodes: SvgNode[][]
+  map: Map<number, SvgNode>
 }
-
-export type Node = {
-  id: number
-  parents: Set<number>
-}
-
-export type Graph = Map<number, Set<number>>

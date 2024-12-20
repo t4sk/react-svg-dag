@@ -1,4 +1,14 @@
-import { Point, Rect, MidPoints, Canvas, Layout, Graph } from "./types"
+import {
+  Node,
+  Graph,
+  Point,
+  Rect,
+  MidPoints,
+  Arrow,
+  Canvas,
+  SvgNode,
+  Layout,
+} from "./types"
 import * as dag from "./dag"
 import * as math from "./math"
 
@@ -99,18 +109,24 @@ export function map(graph: Graph, canvas: Canvas): Layout {
 
   const mid = getMidPoints(rect)
 
-  const nodes: Rect[][] = []
+  const nodes: SvgNode[][] = []
+  const map: Map<number, SvgNode> = new Map()
   for (let i = 0; i < rows.length; i++) {
-    const row: Rect[] = []
+    const row: SvgNode[] = []
     const box = boxes[i]
     for (let j = 0; j < rows[i].length; j++) {
-      row.push({
-        id: rows[i][j],
-        x: box.x + j * (canvas.node.width + canvas.node.gap),
-        y: box.y,
-        width: canvas.node.width,
-        height: canvas.node.height,
-      })
+      const id = rows[i][j]
+      const node = {
+        id,
+        rect: {
+          x: box.x + j * (canvas.node.width + canvas.node.gap),
+          y: box.y,
+          width: canvas.node.width,
+          height: canvas.node.height,
+        },
+      }
+      row.push(node)
+      map.set(id, node)
     }
     nodes.push(row)
   }
@@ -118,7 +134,40 @@ export function map(graph: Graph, canvas: Canvas): Layout {
   return {
     rect,
     mid,
-    nodes,
     boxes,
+    nodes,
+    map,
+  }
+}
+
+export function getEdge(layout: Layout, start: number, end: number): Arrow {
+  const s = layout.map.get(start) as SvgNode
+  const e = layout.map.get(end) as SvgNode
+
+  const m0 = getMidPoints(s.rect)
+  const m1 = getMidPoints(e.rect)
+
+  let p0 = { x: 0, y: 0 }
+  let p1 = { x: 0, y: 0 }
+
+  if (s.rect.y > e.rect.y) {
+    p0 = m0.top
+    p1 = m1.bottom
+  } else if (s.rect.y < e.rect.y) {
+    p0 = m0.bottom
+    p1 = m1.top
+  } else {
+    if (s.rect.x <= e.rect.x) {
+      p0 = m0.right
+      p1 = m1.left
+    } else {
+      p0 = m0.left
+      p1 = m1.right
+    }
+  }
+
+  return {
+    start: p0,
+    end: p1,
   }
 }
