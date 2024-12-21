@@ -151,6 +151,17 @@ const SvgGraph: React.FC = () => {
           fill="transparent"
         />
       ))*/}
+      {layout.nodes.map((row, i) => {
+        return row.map((node, j) => (
+          <SvgRect
+            key={j}
+            x={node.rect.x}
+            y={node.rect.y}
+            width={node.rect.width}
+            height={node.rect.height}
+          />
+        ))
+      })}
       {arrows.map((e, i) => {
         if (e.start.y == e.end.y) {
           return (
@@ -167,17 +178,6 @@ const SvgGraph: React.FC = () => {
             t={0.1}
           />
         )
-      })}
-      {layout.nodes.map((row, i) => {
-        return row.map((node, j) => (
-          <SvgRect
-            key={j}
-            x={node.rect.x}
-            y={node.rect.y}
-            width={node.rect.width}
-            height={node.rect.height}
-          />
-        ))
       })}
     </svg>
   )
