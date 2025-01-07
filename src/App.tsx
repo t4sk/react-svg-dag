@@ -2,7 +2,14 @@ import { useRef, useEffect } from "react"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
 import { Rect, Arrow } from "./lib/types"
-import { SvgRect, SvgLine, SvgDot, SvgCubicBezier } from "./Svg"
+import {
+  SvgRect,
+  SvgLine,
+  SvgDot,
+  SvgCubicBezier,
+  SvgArc,
+  SvgBezierArc,
+} from "./Svg"
 
 import { Node } from "./lib/types"
 
@@ -164,8 +171,26 @@ const SvgGraph: React.FC = () => {
       })}
       {arrows.map((e, i) => {
         if (e.start.y == e.end.y) {
+          /*
           return (
             <SvgLine x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
+          )
+          */
+          /*
+          return (
+            <SvgArc x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
+          )
+          */
+
+          return (
+            <SvgCubicBezier
+              key={i}
+              x0={e.start.x}
+              y0={e.start.y}
+              x1={e.end.x}
+              y1={e.end.y}
+              t={0.1}
+            />
           )
         }
         return (
@@ -179,6 +204,44 @@ const SvgGraph: React.FC = () => {
           />
         )
       })}
+
+      <SvgArc x0={0} y0={0} x1={100} y1={100} />
+      <SvgDot x={0} y={0} radius={4} />
+
+      <defs>
+        <marker
+          id="arrow"
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <line
+        x1="10"
+        y1="10"
+        x2="90"
+        y2="90"
+        stroke="black"
+        marker-end="url(#arrow)"
+      />
+
+      <path
+        d="M 110 10
+       C 120 20, 130 20, 140 10
+       C 150 0, 160 0, 170 10
+       C 180 20, 190 20, 200 10"
+        stroke="black"
+        fill="none"
+        marker-start="url(#arrow)"
+        marker-mid="url(#arrow)"
+        marker-end="url(#arrow)"
+      />
     </svg>
   )
 }

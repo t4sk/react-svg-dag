@@ -91,22 +91,125 @@ export const SvgCubicBezier: React.FC<{
       <path
         d={`M ${x0}, ${y0} L ${x0} ${y0 + dy}`}
         stroke="black"
-        fill="transparent"
+        fill="none"
         strokeWidth="2"
       />
       <path
         d={`M ${x0} ${y0 + dy} C ${x0_t},${y0_t} ${x1_t},${y1_t} ${x1},${y1 - dy}`}
         stroke="black"
-        fill="transparent"
+        fill="none"
         strokeWidth="2"
       />
       <path
         d={`M ${x1}, ${y1 - dy} L ${x1} ${y1 - arrow}`}
         stroke="black"
-        fill="transparent"
+        fill="none"
         strokeWidth="2"
         markerEnd="url(#arrow)"
       />
     </>
+  )
+}
+
+/*
+export const SvgArc: React.FC<{
+  x0: number
+  y0: number
+  x1: number
+  y1: number
+}> = ({ x0, y0, x1, y1 }) => {
+  return (
+    <path
+      d="M 100 100 A 30 50 0 0 1 150 0"
+      stroke="black"
+      fill="none"
+      strokeWidth="2"
+    />
+  )
+}
+*/
+
+export const SvgArc = ({
+  // @ts-ignore
+  x0,
+  // @ts-ignore
+  y0,
+  // @ts-ignore
+  x1,
+  // @ts-ignore
+  y1,
+  curvature = 0.1,
+  stroke = "black",
+  strokeWidth = 2,
+  fill = "none",
+}) => {
+  // Calculate the mid-point between the two points
+  const midX = (x0 + x1) / 2
+  const midY = (y0 + y1) / 2
+
+  // Calculate control point for the quadratic Bézier curve
+  const controlX = midX + curvature * (y1 - y0)
+  const controlY = midY - curvature * (x1 - x0)
+
+  // Construct the path using the SVG quadratic Bézier curve command
+  const pathData = `M ${x0},${y0} Q ${controlX},${controlY} ${x1},${y1}`
+
+  return (
+    <svg style={{ overflow: "visible" }}>
+      <defs>
+        <marker
+          id="arc-arrow"
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <path
+        d={pathData}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        fill={fill}
+        markerMid="url(#arc-arrow)"
+      />
+    </svg>
+  )
+}
+
+export const SvgBezierArc = ({
+  // @ts-ignore
+  x0,
+  // @ts-ignore
+  y0,
+  // @ts-ignore
+  x1,
+  curvature = 0.1, // Positive for upward arc, negative for downward arc
+  stroke = "black",
+  strokeWidth = 1,
+  fill = "none",
+}) => {
+  // Midpoint between (x0, y0) and (x1, y1)
+  const midX = (x0 + x1) / 2
+
+  // Control point for the arc
+  const controlX = midX
+  const controlY = y0 - curvature * Math.abs(x1 - x0)
+
+  // SVG path data for a quadratic Bézier curve
+  const pathData = `M ${x0},${y0} Q ${controlX},${controlY} ${x1},${y0}`
+
+  return (
+    <svg style={{ overflow: "visible" }}>
+      <path
+        d={pathData}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        fill={fill}
+      />
+    </svg>
   )
 }
