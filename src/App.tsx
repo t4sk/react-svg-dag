@@ -7,8 +7,7 @@ import {
   SvgLine,
   SvgDot,
   SvgCubicBezier,
-  SvgArc,
-  SvgBezierArc,
+  SvgCubicBezierArc,
 } from "./Svg"
 
 import { Node } from "./lib/types"
@@ -95,7 +94,7 @@ const SvgGraph: React.FC = () => {
     node: {
       width: 200,
       height: 100,
-      gap: 40,
+      gap: 60,
     },
   })
 
@@ -181,17 +180,29 @@ const SvgGraph: React.FC = () => {
             <SvgArc x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
           )
           */
-
-          return (
-            <SvgCubicBezier
-              key={i}
-              x0={e.start.x}
-              y0={e.start.y}
-              x1={e.end.x}
-              y1={e.end.y}
-              t={0.1}
-            />
-          )
+          if (e.start.x <= e.end.x) {
+            return (
+              <SvgCubicBezierArc
+                key={i}
+                x0={e.start.x + 20}
+                y0={e.start.y}
+                x1={e.end.x - 20}
+                y1={e.end.y}
+                t={0.1}
+              />
+            )
+          } else {
+            return (
+              <SvgCubicBezierArc
+                key={i}
+                x0={e.start.x - 20}
+                y0={e.start.y}
+                x1={e.end.x + 20}
+                y1={e.end.y}
+                t={0.1}
+              />
+            )
+          }
         }
         return (
           <SvgCubicBezier
@@ -200,12 +211,11 @@ const SvgGraph: React.FC = () => {
             y0={e.start.y}
             x1={e.end.x}
             y1={e.end.y}
-            t={0.1}
+            t={0.2}
           />
         )
       })}
 
-      <SvgArc x0={0} y0={0} x1={100} y1={100} />
       <SvgDot x={0} y={0} radius={4} />
 
       <defs>
@@ -231,6 +241,7 @@ const SvgGraph: React.FC = () => {
         marker-end="url(#arrow)"
       />
 
+      {/*
       <path
         d="M 110 10
        C 120 20, 130 20, 140 10
@@ -242,6 +253,7 @@ const SvgGraph: React.FC = () => {
         marker-mid="url(#arrow)"
         marker-end="url(#arrow)"
       />
+      */}
     </svg>
   )
 }

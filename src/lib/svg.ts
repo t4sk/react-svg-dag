@@ -157,13 +157,8 @@ export function getEdge(layout: Layout, start: number, end: number): Arrow {
     p0 = m0.bottom
     p1 = m1.top
   } else {
-    if (s.rect.x <= e.rect.x) {
-      p0 = m0.top
-      p1 = m1.top
-    } else {
-      p0 = m0.top
-      p1 = m1.top
-    }
+    p0 = m0.top
+    p1 = m1.top
   }
 
   return {
