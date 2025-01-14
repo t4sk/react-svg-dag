@@ -11,7 +11,27 @@ import {
 } from "./Svg"
 
 import { Node } from "./lib/types"
+import { DATA } from "./data"
 
+const topic_to_id = DATA.reduce((z, d, i) => {
+  // @ts-ignore
+  z[d.topic] = i + 1
+  return z
+}, {})
+
+// @ts-ignore
+const nodes: Node[] = DATA.map((d, i) => {
+  console.log(d, i)
+  return {
+    id: i + 1,
+    // @ts-ignore
+    parents: new Set(d.parents.map((t) => topic_to_id[t])),
+  }
+})
+
+const cards = DATA.map((d) => d.topic)
+
+/*
 const nodes: Node[] = [
   {
     id: 1,
@@ -42,6 +62,7 @@ const nodes: Node[] = [
     parents: new Set([4]),
   },
 ]
+*/
 
 const g = dag.build(nodes)
 console.log("g", g)
@@ -72,8 +93,8 @@ const SvgGraph: React.FC = () => {
       y: 300,
     },
     node: {
-      width: 200,
-      height: 100,
+      width: 100,
+      height: 50,
       gap: 60,
     },
   })
@@ -91,8 +112,6 @@ const SvgGraph: React.FC = () => {
       }
     }
   })
-
-  const cards = ["basic", "defi", "algorithm", "function", "e", "f", "g"]
 
   return (
     <div style={{ position: "relative" }}>
