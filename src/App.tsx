@@ -42,9 +42,6 @@ const nodes: Node[] = [
     parents: new Set([4]),
   },
 ]
-// 1 -> 2 -> 4
-// 1 -> 2 -> 3 -> 5
-// 1 -> 3 -> 5
 
 const g = dag.build(nodes)
 console.log("g", g)
@@ -57,23 +54,6 @@ console.log(dag.group(g, 1))
 // TODO: zoom
 // TODO: drag
 const SvgGraph: React.FC = () => {
-  const r0: Rect = {
-    x: 10,
-    y: 20,
-    width: 100,
-    height: 100,
-  }
-
-  const r1: Rect = {
-    x: 100,
-    y: 160,
-    width: 100,
-    height: 200,
-  }
-
-  const m0 = svg.iter(svg.getMidPoints(r0))
-  const m1 = svg.iter(svg.getMidPoints(r1))
-
   const graph = dag.build(nodes)
   console.log("--- dfs ---")
   console.log(
@@ -112,149 +92,92 @@ const SvgGraph: React.FC = () => {
     }
   })
 
+  const cards = ["basic", "defi", "algorithm", "function", "e", "f", "g"]
+
   return (
-    <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
-      <SvgRect x={r0.x} y={r0.y} width={r0.width} height={r0.height} />
-      <SvgRect x={r1.x} y={r1.y} width={r1.width} height={r1.height} />
-      <SvgDot x={svg.getCenterX(r0)} y={svg.getCenterY(r0)} radius={4} />
-      <SvgDot x={svg.getCenterX(r1)} y={svg.getCenterY(r1)} radius={4} />
-      {m0.map((p, i) => (
-        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
-      ))}
-      {m1.map((p, i) => (
-        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
-      ))}
-      <SvgLine x0={m0[0].x} y0={m0[0].y} x1={m0[2].x} y1={m0[2].y} />
-      <SvgLine x0={m0[1].x} y0={m0[1].y} x1={m0[3].x} y1={m0[3].y} />
-      <SvgLine x0={m1[0].x} y0={m1[0].y} x1={m1[2].x} y1={m1[2].y} />
-      <SvgLine x0={m1[1].x} y0={m1[1].y} x1={m1[3].x} y1={m1[3].y} />
+    <div style={{ position: "relative" }}>
+      <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
+        {svg.iter(layout.mid).map((p, i) => (
+          <SvgDot x={p.x} y={p.y} key={i} radius={4} />
+        ))}
+        {layout.nodes.map((row, i) => {
+          return row.map((node, j) => (
+            <SvgRect
+              key={j}
+              x={node.rect.x}
+              y={node.rect.y}
+              width={node.rect.width}
+              height={node.rect.height}
+            />
+          ))
+        })}
+        {arrows.map((e, i) => {
+          if (e.start.y == e.end.y) {
+            if (e.start.x <= e.end.x) {
+              return (
+                <SvgCubicBezierArc
+                  key={i}
+                  x0={e.start.x + 20}
+                  y0={e.start.y}
+                  x1={e.end.x - 20}
+                  y1={e.end.y}
+                  t={0.1}
+                />
+              )
+            } else {
+              return (
+                <SvgCubicBezierArc
+                  key={i}
+                  x0={e.start.x - 20}
+                  y0={e.start.y}
+                  x1={e.end.x + 20}
+                  y1={e.end.y}
+                  t={0.1}
+                />
+              )
+            }
+          }
+          return (
+            <SvgCubicBezier
+              key={i}
+              x0={e.start.x}
+              y0={e.start.y}
+              x1={e.end.x}
+              y1={e.end.y}
+              t={0.2}
+            />
+          )
+        })}
 
-      <SvgCubicBezier
-        x0={m0[2].x}
-        y0={m0[2].y}
-        x1={m1[0].x}
-        y1={m1[0].y}
-        t={0.1}
-      />
-
-      <SvgRect
-        x={layout.rect.x}
-        y={layout.rect.y}
-        width={layout.rect.width}
-        height={layout.rect.height}
-        fill="transparent"
-      />
-      {svg.iter(layout.mid).map((p, i) => (
-        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
-      ))}
-      {/*layout.boxes.map((b, i) => (
-        <SvgRect
-          key={i}
-          x={b.x}
-          y={b.y}
-          width={b.width}
-          height={b.height}
-          fill="transparent"
-        />
-      ))*/}
+        <SvgDot x={0} y={0} radius={4} />
+      </svg>
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
-          <SvgRect
-            key={j}
-            x={node.rect.x}
-            y={node.rect.y}
-            width={node.rect.width}
-            height={node.rect.height}
-          />
+          <div
+            style={{
+              position: "absolute",
+              top: node.rect.y,
+              left: node.rect.x,
+              width: node.rect.width,
+              height: node.rect.height,
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {cards[node.id - 1]}
+            </div>
+          </div>
         ))
       })}
-      {arrows.map((e, i) => {
-        if (e.start.y == e.end.y) {
-          /*
-          return (
-            <SvgLine x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
-          )
-          */
-          /*
-          return (
-            <SvgArc x0={e.start.x} y0={e.start.y} x1={e.end.x} y1={e.end.y} />
-          )
-          */
-          if (e.start.x <= e.end.x) {
-            return (
-              <SvgCubicBezierArc
-                key={i}
-                x0={e.start.x + 20}
-                y0={e.start.y}
-                x1={e.end.x - 20}
-                y1={e.end.y}
-                t={0.1}
-              />
-            )
-          } else {
-            return (
-              <SvgCubicBezierArc
-                key={i}
-                x0={e.start.x - 20}
-                y0={e.start.y}
-                x1={e.end.x + 20}
-                y1={e.end.y}
-                t={0.1}
-              />
-            )
-          }
-        }
-        return (
-          <SvgCubicBezier
-            key={i}
-            x0={e.start.x}
-            y0={e.start.y}
-            x1={e.end.x}
-            y1={e.end.y}
-            t={0.2}
-          />
-        )
-      })}
-
-      <SvgDot x={0} y={0} radius={4} />
-
-      <defs>
-        <marker
-          id="arrow"
-          viewBox="0 0 10 10"
-          refX="5"
-          refY="5"
-          markerWidth="6"
-          markerHeight="6"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
-
-      <line
-        x1="10"
-        y1="10"
-        x2="90"
-        y2="90"
-        stroke="black"
-        marker-end="url(#arrow)"
-      />
-
-      {/*
-      <path
-        d="M 110 10
-       C 120 20, 130 20, 140 10
-       C 150 0, 160 0, 170 10
-       C 180 20, 190 20, 200 10"
-        stroke="black"
-        fill="none"
-        marker-start="url(#arrow)"
-        marker-mid="url(#arrow)"
-        marker-end="url(#arrow)"
-      />
-      */}
-    </svg>
+    </div>
   )
 }
 
