@@ -1,14 +1,9 @@
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
 import { Rect, Arrow } from "./lib/types"
-import {
-  SvgRect,
-  SvgLine,
-  SvgDot,
-  SvgCubicBezier,
-  SvgCubicBezierArc,
-} from "./Svg"
+import { SvgRect, SvgDot, SvgCubicBezier, SvgCubicBezierArc } from "./Svg"
+import { Controller } from "./Controller"
 
 import { Node } from "./lib/types"
 import { DATA } from "./data"
@@ -71,11 +66,14 @@ console.log(dag.dfs(g, 1, (path) => console.log(path)))
 console.log("--- bfs ---")
 console.log(dag.group(g, 1))
 
-// TODO: zoom
-// TODO: drag
-// TODO: hover
-// TODO: zoom controller
-const SvgGraph: React.FC = () => {
+type ViewBox = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+const SvgGraph: React.FC<{ viewBox: ViewBox }> = ({ viewBox }) => {
   const graph = dag.build(nodes)
   console.log("--- dfs ---")
   console.log(
@@ -114,14 +112,11 @@ const SvgGraph: React.FC = () => {
     }
   })
 
-  // zoom in -> view box decrease width, height
-  // zoome out -> view box increase width, height
-  // drag -> move view box x, y
   return (
     <svg
       width="800"
       height="600"
-      viewBox="-1000 -200 2800 1800"
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       style={{ backgroundColor: "pink" }}
     >
       {svg.iter(layout.mid).map((p, i) => (
@@ -205,10 +200,62 @@ const SvgGraph: React.FC = () => {
   )
 }
 
+// TODO: zoom - linear zoom
+// TODO: drag
+// TODO: hover
+
+// zoom in -> view box decrease width, height
+// zoome out -> view box increase width, height
+// drag -> move view box x, y
+
 function App() {
+  const WIDTH = 800
+  const HEIGHT = 600
+  const [center, setCenter] = useState({
+    x: WIDTH / 2,
+    y: HEIGHT / 2,
+  })
+  const [viewBox, setViewBox] = useState({
+    x: 0,
+    y: 0,
+    width: WIDTH,
+    height: HEIGHT,
+  })
+
+  function onClickPlus() {
+    const width = viewBox.width / 1.2
+    const height = viewBox.height / 1.2
+    setViewBox({
+      x: center.x - width / 2,
+      y: center.y - height / 2,
+      width,
+      height,
+    })
+  }
+
+  function onClickMinus() {
+    const width = viewBox.width * 1.2
+    const height = viewBox.height * 1.2
+    setViewBox({
+      x: center.x - width / 2,
+      y: center.y - height / 2,
+      width,
+      height,
+    })
+  }
+
+  const percentage = (WIDTH / viewBox.width) * 100
+
   return (
-    <div style={{ backgroundColor: "white" }}>
-      <SvgGraph />
+    <div style={{ backgroundColor: "white", position: "relative" }}>
+      <SvgGraph viewBox={viewBox} />
+      <div style={{ position: "absolute", bottom: 0, left: 0 }}>
+        <Controller
+          onClickPlus={onClickPlus}
+          onClickMinus={onClickMinus}
+          percentage={percentage}
+        />
+      </div>
     </div>
   )
 }
