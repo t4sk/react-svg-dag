@@ -71,9 +71,10 @@ console.log(dag.dfs(g, 1, (path) => console.log(path)))
 console.log("--- bfs ---")
 console.log(dag.group(g, 1))
 
-// TODO: view box
 // TODO: zoom
 // TODO: drag
+// TODO: hover
+// TODO: zoom controller
 const SvgGraph: React.FC = () => {
   const graph = dag.build(nodes)
   console.log("--- dfs ---")
@@ -113,73 +114,75 @@ const SvgGraph: React.FC = () => {
     }
   })
 
+  // zoom in -> view box decrease width, height
+  // zoome out -> view box increase width, height
+  // drag -> move view box x, y
   return (
-    <div style={{ position: "relative" }}>
-      <svg width="800" height="600" style={{ backgroundColor: "pink" }}>
-        {svg.iter(layout.mid).map((p, i) => (
-          <SvgDot x={p.x} y={p.y} key={i} radius={4} />
-        ))}
-        {layout.nodes.map((row, i) => {
-          return row.map((node, j) => (
-            <SvgRect
-              key={j}
-              x={node.rect.x}
-              y={node.rect.y}
-              width={node.rect.width}
-              height={node.rect.height}
-            />
-          ))
-        })}
-        {arrows.map((e, i) => {
-          if (e.start.y == e.end.y) {
-            if (e.start.x <= e.end.x) {
-              return (
-                <SvgCubicBezierArc
-                  key={i}
-                  x0={e.start.x + 20}
-                  y0={e.start.y}
-                  x1={e.end.x - 20}
-                  y1={e.end.y}
-                  t={0.1}
-                />
-              )
-            } else {
-              return (
-                <SvgCubicBezierArc
-                  key={i}
-                  x0={e.start.x - 20}
-                  y0={e.start.y}
-                  x1={e.end.x + 20}
-                  y1={e.end.y}
-                  t={0.1}
-                />
-              )
-            }
-          }
-          return (
-            <SvgCubicBezier
-              key={i}
-              x0={e.start.x}
-              y0={e.start.y}
-              x1={e.end.x}
-              y1={e.end.y}
-              t={0.2}
-            />
-          )
-        })}
-
-        <SvgDot x={0} y={0} radius={4} />
-      </svg>
+    <svg
+      width="800"
+      height="600"
+      viewBox="-1000 -200 2800 1800"
+      style={{ backgroundColor: "pink" }}
+    >
+      {svg.iter(layout.mid).map((p, i) => (
+        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
+      ))}
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
-          <div
-            style={{
-              position: "absolute",
-              top: node.rect.y,
-              left: node.rect.x,
-              width: node.rect.width,
-              height: node.rect.height,
-            }}
+          <SvgRect
+            key={j}
+            x={node.rect.x}
+            y={node.rect.y}
+            width={node.rect.width}
+            height={node.rect.height}
+          />
+        ))
+      })}
+      {arrows.map((e, i) => {
+        if (e.start.y == e.end.y) {
+          if (e.start.x <= e.end.x) {
+            return (
+              <SvgCubicBezierArc
+                key={i}
+                x0={e.start.x + 20}
+                y0={e.start.y}
+                x1={e.end.x - 20}
+                y1={e.end.y}
+                t={0.1}
+              />
+            )
+          } else {
+            return (
+              <SvgCubicBezierArc
+                key={i}
+                x0={e.start.x - 20}
+                y0={e.start.y}
+                x1={e.end.x + 20}
+                y1={e.end.y}
+                t={0.1}
+              />
+            )
+          }
+        }
+        return (
+          <SvgCubicBezier
+            key={i}
+            x0={e.start.x}
+            y0={e.start.y}
+            x1={e.end.x}
+            y1={e.end.y}
+            t={0.2}
+          />
+        )
+      })}
+
+      {layout.nodes.map((row, i) => {
+        return row.map((node, j) => (
+          <foreignObject
+            x={node.rect.x}
+            y={node.rect.y}
+            width={node.rect.width}
+            height={node.rect.height}
           >
             <div
               style={{
@@ -189,14 +192,16 @@ const SvgGraph: React.FC = () => {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
+                color: "white",
+                textAlign: "center",
               }}
             >
               {cards[node.id - 1]}
             </div>
-          </div>
+          </foreignObject>
         ))
       })}
-    </div>
+    </svg>
   )
 }
 
