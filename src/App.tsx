@@ -73,7 +73,11 @@ type ViewBox = {
   height: number
 }
 
-const SvgGraph: React.FC<{ viewBox: ViewBox }> = ({ viewBox }) => {
+const SvgGraph: React.FC<{
+  width: number
+  height: number
+  viewBox: ViewBox
+}> = ({ width, height, viewBox }) => {
   const graph = dag.build(nodes)
   console.log("--- dfs ---")
   console.log(
@@ -85,11 +89,11 @@ const SvgGraph: React.FC<{ viewBox: ViewBox }> = ({ viewBox }) => {
   console.log("rows", rows)
 
   const layout = svg.map(graph, {
-    width: 800,
-    height: 600,
+    width,
+    height,
     center: {
-      x: 400,
-      y: 300,
+      x: width / 2,
+      y: height / 2,
     },
     node: {
       width: 100,
@@ -114,8 +118,8 @@ const SvgGraph: React.FC<{ viewBox: ViewBox }> = ({ viewBox }) => {
 
   return (
     <svg
-      width="800"
-      height="600"
+      width={width}
+      height={height}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       style={{ backgroundColor: "pink" }}
     >
@@ -209,8 +213,8 @@ const SvgGraph: React.FC<{ viewBox: ViewBox }> = ({ viewBox }) => {
 // drag -> move view box x, y
 
 function App() {
-  const WIDTH = 800
-  const HEIGHT = 600
+  const WIDTH = 600
+  const HEIGHT = 400
   const [center, setCenter] = useState({
     x: WIDTH / 2,
     y: HEIGHT / 2,
@@ -247,8 +251,15 @@ function App() {
   const percentage = (WIDTH / viewBox.width) * 100
 
   return (
-    <div style={{ backgroundColor: "white", position: "relative" }}>
-      <SvgGraph viewBox={viewBox} />
+    <div
+      style={{
+        backgroundColor: "white",
+        position: "relative",
+        width: WIDTH,
+        height: HEIGHT,
+      }}
+    >
+      <SvgGraph width={WIDTH} height={HEIGHT} viewBox={viewBox} />
       <div style={{ position: "absolute", bottom: 0, left: 0 }}>
         <Controller
           onClickPlus={onClickPlus}
