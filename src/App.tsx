@@ -120,6 +120,25 @@ const SvgGraph: React.FC<{
     }
   })
 
+  const svgX = mouse
+    ? svg.getViewBoxX(width, mouse.x, viewBox.width, viewBox.x)
+    : 0
+  const svgY = mouse
+    ? svg.getViewBoxY(height, mouse.y, viewBox.height, viewBox.y)
+    : 0
+
+  if (svgX != 0 && svgY != 0) {
+    const i = svg.bsearch(layout.nodes, (row) => row[0].mid.center.y, svgY)
+    // @ts-ignore
+    if (layout.nodes[i]) {
+      // @ts-ignore
+      const row = layout.nodes[i]
+      // @ts-ignore
+      const j = svg.bsearch(row, (node) => node.mid.center.x, svgX)
+      console.log(row[j], cards[row[j].id - 1])
+    }
+  }
+
   return (
     <svg
       width={width}
@@ -199,19 +218,15 @@ const SvgGraph: React.FC<{
                 textAlign: "center",
               }}
             >
-              {cards[node.id - 1]}
+              <a href="/" style={{ color: "white" }}>
+                {cards[node.id - 1]}
+              </a>
             </div>
           </foreignObject>
         ))
       })}
 
-      {mouse ? (
-        <SvgDot
-          x={math.getViewBoxX(width, mouse.x, viewBox.width, viewBox.x)}
-          y={math.getViewBoxY(height, mouse.y, viewBox.height, viewBox.y)}
-          radius={4}
-        />
-      ) : null}
+      {mouse && false ? <SvgDot x={svgX} y={svgY} radius={4} /> : null}
     </svg>
   )
 }
@@ -219,6 +234,7 @@ const SvgGraph: React.FC<{
 // TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
 // TODO: hover
+// TODO: hover highlight connecting edges
 
 // zoom in -> view box decrease width, height
 // zoome out -> view box increase width, height

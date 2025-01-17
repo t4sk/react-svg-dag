@@ -12,6 +12,59 @@ import {
 import * as dag from "./dag"
 import * as math from "./math"
 
+// binary search
+export function bsearch<A>(
+  arr: A[],
+  get: (a: A) => number,
+  x: number,
+): number | null {
+  if (arr.length == 0) {
+    return null
+  }
+
+  if (arr.length == 1) {
+    return 0
+  }
+
+  let low = 0
+  let high = arr.length - 1
+
+  if (get(arr[low]) > get(arr[high])) {
+    throw new Error("data not sorted")
+  }
+
+  // Binary search
+  while (low < high) {
+    let mid = ((low + high) / 2) >> 0
+
+    if (get(arr[mid]) > x) {
+      high = mid
+    } else {
+      low = mid + 1
+    }
+  }
+
+  return low
+}
+
+export function getViewBoxX(
+  width: number,
+  mouseX: number,
+  viewBoxWidth: number,
+  viewBoxX: number,
+): number {
+  return math.lin(viewBoxWidth, width, mouseX, viewBoxX)
+}
+
+export function getViewBoxY(
+  height: number,
+  mouseY: number,
+  viewBoxHeight: number,
+  viewBoxY: number,
+): number {
+  return math.lin(viewBoxHeight, height, mouseY, viewBoxY)
+}
+
 export function getCenterX(rect: Rect): number {
   return rect.x + (rect.width >> 1)
 }
@@ -116,14 +169,16 @@ export function map(graph: Graph, canvas: Canvas): Layout {
     const box = boxes[i]
     for (let j = 0; j < rows[i].length; j++) {
       const id = rows[i][j]
+      const rect: Rect = {
+        x: box.x + j * (canvas.node.width + canvas.node.gap),
+        y: box.y,
+        width: canvas.node.width,
+        height: canvas.node.height,
+      }
       const node = {
         id,
-        rect: {
-          x: box.x + j * (canvas.node.width + canvas.node.gap),
-          y: box.y,
-          width: canvas.node.width,
-          height: canvas.node.height,
-        },
+        rect,
+        mid: getMidPoints(rect),
       }
       row.push(node)
       map.set(id, node)

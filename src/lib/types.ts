@@ -43,6 +43,7 @@ export type SvgNode = {
   // Node id
   id: number
   rect: Rect
+  mid: MidPoints
 }
 
 export type Layout = {
