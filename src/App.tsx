@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
+import * as math from "./lib/math"
 import { Rect, Arrow } from "./lib/types"
 import { SvgRect, SvgDot, SvgCubicBezier, SvgCubicBezierArc } from "./Svg"
 import { Controller } from "./Controller"
@@ -77,16 +78,19 @@ const SvgGraph: React.FC<{
   width: number
   height: number
   viewBox: ViewBox
-}> = ({ width, height, viewBox }) => {
+  mouse: Point | null
+}> = ({ width, height, viewBox, mouse }) => {
   const graph = dag.build(nodes)
+  /*
   console.log("--- dfs ---")
   console.log(
     dag.dfs(graph, 1, (path) => {
       console.log(path)
     }),
   )
+  */
   const rows = dag.group(graph, 1)
-  console.log("rows", rows)
+  // console.log("rows", rows)
 
   const layout = svg.map(graph, {
     width,
@@ -102,7 +106,7 @@ const SvgGraph: React.FC<{
     },
   })
 
-  console.log("LAYOUT", layout)
+  // console.log("LAYOUT", layout)
 
   const arrows: Arrow[] = []
   nodes.map((node) => {
@@ -200,21 +204,44 @@ const SvgGraph: React.FC<{
           </foreignObject>
         ))
       })}
+
+      {mouse ? (
+        <SvgDot
+          x={math.getViewBoxX(width, mouse.x, viewBox.width, viewBox.x)}
+          y={math.getViewBoxY(height, mouse.y, viewBox.height, viewBox.y)}
+          radius={4}
+        />
+      ) : null}
     </svg>
   )
 }
 
 // TODO: zoom - linear zoom
-// TODO: drag
+// TODO: layout nodes by "nearest" distance
 // TODO: hover
 
 // zoom in -> view box decrease width, height
 // zoome out -> view box increase width, height
 // drag -> move view box x, y
 
+export type Drag = {
+  startMouseX: number
+  startMouseY: number
+  startViewBoxX: number
+  startViewBoxY: number
+}
+
+export type Point = {
+  x: number
+  y: number
+}
+
 function App() {
   const WIDTH = 600
   const HEIGHT = 400
+  const ref = useRef(null)
+  const [drag, setDrag] = useState<Drag | null>(null)
+  const [mouse, setMouse] = useState<Point | null>(null)
   const [center, setCenter] = useState({
     x: WIDTH / 2,
     y: HEIGHT / 2,
@@ -248,7 +275,66 @@ function App() {
     })
   }
 
+  function getMouse(
+    // @ts-ignore
+    ref,
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ): Point | null {
+    if (!ref) {
+      return null
+    }
+    const rect = ref.getBoundingClientRect()
+
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    }
+  }
+
+  function onMouseDown(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e.preventDefault()
+    const mouse = getMouse(ref.current, e)
+    if (mouse) {
+      setDrag({
+        startMouseX: mouse.x,
+        startMouseY: mouse.y,
+        startViewBoxX: viewBox.x,
+        startViewBoxY: viewBox.y,
+      })
+    }
+  }
+  function onMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e.preventDefault()
+    console.log("up")
+    setDrag(null)
+  }
+  function onMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e.preventDefault()
+    // console.log("move", getMouse(ref.current, e))
+    const mouse = getMouse(ref.current, e)
+    if (mouse) {
+      setMouse(mouse)
+      if (drag) {
+        // @ts-ignore
+        const dx = mouse.x - drag.startMouseX
+        const dy = mouse.y - drag.startMouseY
+        setViewBox({
+          ...viewBox,
+          x: drag.startViewBoxX - dx,
+          y: drag.startViewBoxY - dy,
+        })
+      }
+    }
+  }
+  function onMouseOut(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e.preventDefault()
+    console.log("out")
+    setDrag(null)
+  }
+
   const percentage = (WIDTH / viewBox.width) * 100
+
+  console.log(viewBox, mouse)
 
   return (
     <div
@@ -258,8 +344,26 @@ function App() {
         width: WIDTH,
         height: HEIGHT,
       }}
+      ref={ref}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
     >
-      <SvgGraph width={WIDTH} height={HEIGHT} viewBox={viewBox} />
+      <SvgGraph width={WIDTH} height={HEIGHT} viewBox={viewBox} mouse={mouse} />
+      {/* UI */}
+      {drag ? (
+        <div
+          style={{
+            cursor: "grabbing",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: WIDTH,
+            height: HEIGHT,
+          }}
+          onMouseOut={onMouseOut}
+        ></div>
+      ) : null}
       <div style={{ position: "absolute", bottom: 0, left: 0 }}>
         <Controller
           onClickPlus={onClickPlus}
