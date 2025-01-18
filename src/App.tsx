@@ -128,14 +128,14 @@ const SvgGraph: React.FC<{
     : 0
 
   if (svgX != 0 && svgY != 0) {
-    const i = svg.bsearch(layout.nodes, (row) => row[0].mid.center.y, svgY)
+    const i = (svg.bsearch(layout.ys, (y) => y, svgY) || 0) >> 1
     // @ts-ignore
-    if (layout.nodes[i]) {
+    if (layout.xs[i]) {
       // @ts-ignore
-      const row = layout.nodes[i]
+      const xs = layout.xs[i]
       // @ts-ignore
-      const j = svg.bsearch(row, (node) => node.mid.center.x, svgX)
-      console.log(row[j], cards[row[j].id - 1])
+      const j = (svg.bsearch(xs, (x) => x, svgX) || 0) >> 1
+      console.log("i", i, "j", j, cards[layout.nodes[i][j].id - 1])
     }
   }
 
@@ -226,7 +226,7 @@ const SvgGraph: React.FC<{
         ))
       })}
 
-      {mouse && false ? <SvgDot x={svgX} y={svgY} radius={4} /> : null}
+      {mouse ? <SvgDot x={svgX} y={svgY + 10} radius={4} /> : null}
     </svg>
   )
 }

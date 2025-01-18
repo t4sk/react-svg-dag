@@ -164,9 +164,12 @@ export function map(graph: Graph, canvas: Canvas): Layout {
 
   const nodes: SvgNode[][] = []
   const map: Map<number, SvgNode> = new Map()
+  const xs: number[][] = []
+  const ys: number[] = []
   for (let i = 0; i < rows.length; i++) {
     const row: SvgNode[] = []
     const box = boxes[i]
+    xs.push([])
     for (let j = 0; j < rows[i].length; j++) {
       const id = rows[i][j]
       const rect: Rect = {
@@ -175,13 +178,18 @@ export function map(graph: Graph, canvas: Canvas): Layout {
         width: canvas.node.width,
         height: canvas.node.height,
       }
+      const mid = getMidPoints(rect)
       const node = {
         id,
         rect,
-        mid: getMidPoints(rect),
+        mid,
       }
       row.push(node)
       map.set(id, node)
+      xs[i].push(mid.left.x, mid.right.x)
+      if (j == 0) {
+        ys.push(mid.top.y, mid.bottom.y)
+      }
     }
     nodes.push(row)
   }
@@ -192,6 +200,8 @@ export function map(graph: Graph, canvas: Canvas): Layout {
     boxes,
     nodes,
     map,
+    xs,
+    ys,
   }
 }
 

@@ -52,4 +52,8 @@ export type Layout = {
   boxes: Rect[]
   nodes: SvgNode[][]
   map: Map<number, SvgNode>
+  // Sorted x coordinates of box boundries for each row
+  xs: number[][]
+  // Sorted y coordinates of row boundries
+  ys: number[]
 }
