@@ -132,11 +132,7 @@ export function box(canvas: Canvas, n: number, p0: Point): Rect {
   }
 }
 
-function getEdgePositions(
-  map: Map<number, SvgNode>,
-  start: number,
-  end: number,
-): Arrow {
+function arrow(map: Map<number, SvgNode>, start: number, end: number): Arrow {
   const s = map.get(start) as SvgNode
   const e = map.get(end) as SvgNode
 
@@ -158,6 +154,8 @@ function getEdgePositions(
   }
 
   return {
+    s: s.id,
+    e: e.id,
     start: p0,
     end: p1,
   }
@@ -241,8 +239,7 @@ export function map(graph: Graph, canvas: Canvas): Layout {
       const es = graph.get(v)
       if (es) {
         for (const e of es) {
-          const arrow = getEdgePositions(map, v, e)
-          arrows.push(arrow)
+          arrows.push(arrow(map, v, e))
         }
       }
     }

@@ -47,7 +47,8 @@ export const SvgCubicBezier: React.FC<{
   x1: number
   y1: number
   t: number
-}> = ({ x0, y0, x1, y1, t }) => {
+  color?: string
+}> = ({ x0, y0, x1, y1, t, color = "black" }) => {
   const dy = DY
   const arrow = ARROW
   const x0_t = math.lerp(x0, x1, t)
@@ -72,19 +73,19 @@ export const SvgCubicBezier: React.FC<{
           refY="2.5"
           orient="auto"
         >
-          <path d="M 0 0 L 5 2.5 L 0 5 z" fill="black" />
+          <path d="M 0 0 L 5 2.5 L 0 5 z" stroke={color} fill={color} />
         </marker>
       </defs>
       <path
         d={`M ${x0}, ${y0} L ${x0} ${y0 + dy}`}
-        stroke="black"
+        stroke={color}
         fill="none"
         strokeWidth="2"
       />
-      <path d={d} stroke="black" fill="none" strokeWidth="2" />
+      <path d={d} stroke={color} fill="none" strokeWidth="2" />
       <path
         d={`M ${x1}, ${y1 - dy} L ${x1} ${y1 - arrow}`}
-        stroke="black"
+        stroke={color}
         fill="none"
         strokeWidth="2"
         markerEnd="url(#arrow)"
@@ -99,7 +100,8 @@ export const SvgCubicBezierArc: React.FC<{
   x1: number
   y1: number
   t: number
-}> = ({ x0, y0, x1, y1, t }) => {
+  color?: string
+}> = ({ x0, y0, x1, y1, t, color = "black" }) => {
   const dy = DY
   const arrow = ARROW
   const mid_x = (x0 + x1) / 2
@@ -127,19 +129,19 @@ export const SvgCubicBezierArc: React.FC<{
           refY="2.5"
           orient="auto"
         >
-          <path d="M 0 0 L 5 2.5 L 0 5 z" fill="black" />
+          <path d="M 0 0 L 5 2.5 L 0 5 z" stroke={color} fill={color} />
         </marker>
       </defs>
       <path
         d={`M ${x0}, ${y0 - dy} L ${x0} ${y0}`}
-        stroke="black"
+        stroke={color}
         fill="none"
         strokeWidth="2"
       />
-      <path d={d} stroke="black" fill="none" strokeWidth="2" />
+      <path d={d} stroke={color} fill="none" strokeWidth="2" />
       <path
         d={`M ${x1}, ${y1 - dy} L ${x1} ${y1 - arrow}`}
-        stroke="black"
+        stroke={color}
         fill="none"
         strokeWidth="2"
         markerEnd="url(#arrow)"

@@ -134,6 +134,8 @@ const SvgGraph: React.FC<{
     }
   }
 
+  const hover = 20
+
   return (
     <svg
       width={width}
@@ -155,28 +157,30 @@ const SvgGraph: React.FC<{
           />
         ))
       })}
-      {layout.arrows.map((e, i) => {
-        if (e.start.y == e.end.y) {
-          if (e.start.x <= e.end.x) {
+      {layout.arrows.map((a, i) => {
+        if (a.start.y == a.end.y) {
+          if (a.start.x <= a.end.x) {
             return (
               <SvgCubicBezierArc
                 key={i}
-                x0={e.start.x + 20}
-                y0={e.start.y}
-                x1={e.end.x - 20}
-                y1={e.end.y}
+                x0={a.start.x + 20}
+                y0={a.start.y}
+                x1={a.end.x - 20}
+                y1={a.end.y}
                 t={0.1}
+                color={a.s == hover || a.e == hover ? "red" : "black"}
               />
             )
           } else {
             return (
               <SvgCubicBezierArc
                 key={i}
-                x0={e.start.x - 20}
-                y0={e.start.y}
-                x1={e.end.x + 20}
-                y1={e.end.y}
+                x0={a.start.x - 20}
+                y0={a.start.y}
+                x1={a.end.x + 20}
+                y1={a.end.y}
                 t={0.1}
+                color={a.s == hover || a.e == hover ? "red" : "black"}
               />
             )
           }
@@ -184,11 +188,12 @@ const SvgGraph: React.FC<{
         return (
           <SvgCubicBezier
             key={i}
-            x0={e.start.x}
-            y0={e.start.y}
-            x1={e.end.x}
-            y1={e.end.y}
+            x0={a.start.x}
+            y0={a.start.y}
+            x1={a.end.x}
+            y1={a.end.y}
             t={0.2}
+            color={a.s == hover || a.e == hover ? "red" : "black"}
           />
         )
       })}

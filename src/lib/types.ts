@@ -20,6 +20,10 @@ export type Rect = {
 }
 
 export type Arrow = {
+  // Starting node id
+  s: number
+  // Ending node id
+  e: number
   start: Point
   end: Point
 }
