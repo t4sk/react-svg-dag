@@ -106,20 +106,6 @@ const SvgGraph: React.FC<{
     },
   })
 
-  // console.log("LAYOUT", layout)
-
-  const arrows: Arrow[] = []
-  nodes.map((node) => {
-    const s = node.id
-    const es = graph.get(s)
-    if (es) {
-      for (const e of es) {
-        const arrow = svg.getEdge(layout, s, e)
-        arrows.push(arrow)
-      }
-    }
-  })
-
   const svgX = mouse
     ? svg.getViewBoxX(width, mouse.x, viewBox.width, viewBox.x)
     : 0
@@ -135,7 +121,16 @@ const SvgGraph: React.FC<{
       const xs = layout.xs[i]
       // @ts-ignore
       const j = (svg.bsearch(xs, (x) => x, svgX) || 0) >> 1
-      console.log("i", i, "j", j, cards[layout.nodes[i][j].id - 1])
+      console.log(
+        "i",
+        i,
+        "j",
+        j,
+        "id",
+        layout.nodes[i][j].id,
+        cards[layout.nodes[i][j].id - 1],
+        svg.isInside({ x: svgX, y: svgY }, layout.nodes[i][j].rect),
+      )
     }
   }
 
@@ -160,7 +155,7 @@ const SvgGraph: React.FC<{
           />
         ))
       })}
-      {arrows.map((e, i) => {
+      {layout.arrows.map((e, i) => {
         if (e.start.y == e.end.y) {
           if (e.start.x <= e.end.x) {
             return (

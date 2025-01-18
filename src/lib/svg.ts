@@ -132,6 +132,46 @@ export function box(canvas: Canvas, n: number, p0: Point): Rect {
   }
 }
 
+function getEdgePositions(
+  map: Map<number, SvgNode>,
+  start: number,
+  end: number,
+): Arrow {
+  const s = map.get(start) as SvgNode
+  const e = map.get(end) as SvgNode
+
+  const m0 = getMidPoints(s.rect)
+  const m1 = getMidPoints(e.rect)
+
+  let p0 = { x: 0, y: 0 }
+  let p1 = { x: 0, y: 0 }
+
+  if (s.rect.y > e.rect.y) {
+    p0 = m0.top
+    p1 = m1.bottom
+  } else if (s.rect.y < e.rect.y) {
+    p0 = m0.bottom
+    p1 = m1.top
+  } else {
+    p0 = m0.top
+    p1 = m1.top
+  }
+
+  return {
+    start: p0,
+    end: p1,
+  }
+}
+
+export function isInside(p: Point, rect: Rect): boolean {
+  return (
+    p.x >= rect.x &&
+    p.x <= rect.x + rect.width &&
+    p.y >= rect.y &&
+    p.y <= rect.y + rect.height
+  )
+}
+
 // TODO: start from input
 // TODO: box layout
 export function map(graph: Graph, canvas: Canvas): Layout {
@@ -194,40 +234,28 @@ export function map(graph: Graph, canvas: Canvas): Layout {
     nodes.push(row)
   }
 
+  const arrows: Arrow[] = []
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = 0; j < nodes[i].length; j++) {
+      const v = nodes[i][j].id
+      const es = graph.get(v)
+      if (es) {
+        for (const e of es) {
+          const arrow = getEdgePositions(map, v, e)
+          arrows.push(arrow)
+        }
+      }
+    }
+  }
+
   return {
     rect,
     mid,
     boxes,
     nodes,
+    arrows,
     map,
     xs,
     ys,
-  }
-}
-
-export function getEdge(layout: Layout, start: number, end: number): Arrow {
-  const s = layout.map.get(start) as SvgNode
-  const e = layout.map.get(end) as SvgNode
-
-  const m0 = getMidPoints(s.rect)
-  const m1 = getMidPoints(e.rect)
-
-  let p0 = { x: 0, y: 0 }
-  let p1 = { x: 0, y: 0 }
-
-  if (s.rect.y > e.rect.y) {
-    p0 = m0.top
-    p1 = m1.bottom
-  } else if (s.rect.y < e.rect.y) {
-    p0 = m0.bottom
-    p1 = m1.top
-  } else {
-    p0 = m0.top
-    p1 = m1.top
-  }
-
-  return {
-    start: p0,
-    end: p1,
   }
 }
