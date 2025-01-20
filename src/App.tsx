@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react"
+import styles from "./App.module.css"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
 import * as math from "./lib/math"
@@ -67,6 +68,18 @@ console.log(dag.dfs(g, 1, (path) => console.log(path)))
 console.log("--- bfs ---")
 console.log(dag.group(g, 1))
 
+const graph = dag.build(nodes)
+/*
+  console.log("--- dfs ---")
+  console.log(
+    dag.dfs(graph, 1, (path) => {
+      console.log(path)
+    }),
+  )
+  */
+const rows = dag.group(graph, 1)
+// console.log("rows", rows)
+
 type ViewBox = {
   x: number
   y: number
@@ -80,18 +93,6 @@ const SvgGraph: React.FC<{
   viewBox: ViewBox
   mouse: Point | null
 }> = ({ width, height, viewBox, mouse }) => {
-  const graph = dag.build(nodes)
-  /*
-  console.log("--- dfs ---")
-  console.log(
-    dag.dfs(graph, 1, (path) => {
-      console.log(path)
-    }),
-  )
-  */
-  const rows = dag.group(graph, 1)
-  // console.log("rows", rows)
-
   const layout = svg.map(graph, {
     width,
     height,
@@ -354,6 +355,7 @@ function App() {
 
   return (
     <div
+      className={styles.svg_container}
       style={{
         backgroundColor: "white",
         position: "relative",
