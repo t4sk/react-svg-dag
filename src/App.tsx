@@ -113,6 +113,7 @@ const SvgGraph: React.FC<{
     ? svg.getViewBoxY(height, mouse.y, viewBox.height, viewBox.y)
     : 0
 
+  let hover = null
   if (svgX != 0 && svgY != 0) {
     const i = (svg.bsearch(layout.ys, (y) => y, svgY) || 0) >> 1
     // @ts-ignore
@@ -131,10 +132,9 @@ const SvgGraph: React.FC<{
         cards[layout.nodes[i][j].id - 1],
         svg.isInside({ x: svgX, y: svgY }, layout.nodes[i][j].rect),
       )
+      hover = layout.nodes[i][j].id
     }
   }
-
-  const hover = 20
 
   return (
     <svg
