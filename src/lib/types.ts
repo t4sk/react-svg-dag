@@ -7,6 +7,13 @@ export type Node = {
 export type Graph = Map<number, Set<number>>
 
 // SVG
+export type ViewBox = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export type Point = {
   x: number
   y: number

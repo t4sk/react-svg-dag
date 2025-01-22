@@ -1,5 +1,4 @@
 import {
-  Node,
   Graph,
   Point,
   Rect,
@@ -11,6 +10,7 @@ import {
 } from "./types"
 import * as dag from "./dag"
 import * as math from "./math"
+import { assert } from "./utils"
 
 // binary search
 export function bsearch<A>(
@@ -29,9 +29,7 @@ export function bsearch<A>(
   let low = 0
   let high = arr.length - 1
 
-  if (get(arr[low]) > get(arr[high])) {
-    throw new Error("data not sorted")
-  }
+  assert(get(arr[low]) < get(arr[high]), "data not sorted")
 
   // Binary search
   while (low < high) {
@@ -170,10 +168,9 @@ export function isInside(p: Point, rect: Rect): boolean {
   )
 }
 
-// TODO: start from input
 // TODO: box layout
-export function map(graph: Graph, canvas: Canvas): Layout {
-  const rows = dag.group(graph, 1)
+export function map(graph: Graph, starts: number[], canvas: Canvas): Layout {
+  const rows = dag.group(graph, starts)
 
   const height =
     rows.length * canvas.node.height + (rows.length - 1) * canvas.node.gap

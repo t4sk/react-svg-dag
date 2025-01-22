@@ -4,8 +4,12 @@ export const DATA = [
     parents: [],
   },
   {
+    topic: "Basic",
+    parents: [],
+  },
+  {
     topic: "Data Types - Values",
-    parents: ["Hello World"],
+    parents: ["Hello World", "Basic"],
   },
   {
     topic: "Data Types - References",

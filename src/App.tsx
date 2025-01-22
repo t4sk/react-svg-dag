@@ -1,13 +1,12 @@
 import { useRef, useEffect, useState } from "react"
 import styles from "./App.module.css"
+import { Node, ViewBox, Point } from "./lib/types"
+import { assert } from "./lib/utils"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
-import * as math from "./lib/math"
-import { Rect, Arrow } from "./lib/types"
 import { SvgRect, SvgDot, SvgCubicBezier, SvgCubicBezierArc } from "./Svg"
 import { Controller } from "./Controller"
 
-import { Node } from "./lib/types"
 import { DATA } from "./data"
 
 const topic_to_id = DATA.reduce((z, d, i) => {
@@ -28,64 +27,14 @@ const nodes: Node[] = DATA.map((d, i) => {
 
 const cards = DATA.map((d) => d.topic)
 
-/*
-const nodes: Node[] = [
-  {
-    id: 1,
-    parents: new Set([]),
-  },
-  {
-    id: 2,
-    parents: new Set([1]),
-  },
-  {
-    id: 3,
-    parents: new Set([1, 2]),
-  },
-  {
-    id: 4,
-    parents: new Set([2]),
-  },
-  {
-    id: 5,
-    parents: new Set([3]),
-  },
-  {
-    id: 6,
-    parents: new Set([3, 4]),
-  },
-  {
-    id: 7,
-    parents: new Set([4]),
-  },
-]
-*/
+const { graph, starts } = dag.build(nodes)
 
-const g = dag.build(nodes)
-console.log("g", g)
-console.log("--- dfs ---")
-console.log(dag.dfs(g, 1, (path) => console.log(path)))
-console.log("--- bfs ---")
-console.log(dag.group(g, 1))
-
-const graph = dag.build(nodes)
-/*
-  console.log("--- dfs ---")
-  console.log(
-    dag.dfs(graph, 1, (path) => {
-      console.log(path)
-    }),
-  )
-  */
-const rows = dag.group(graph, 1)
-// console.log("rows", rows)
-
-type ViewBox = {
-  x: number
-  y: number
-  width: number
-  height: number
+// Check valid DAG
+for (const s of starts) {
+  assert(dag.dfs(graph, s), `invalid DAG starting from ${s}`)
 }
+
+// TODO:  multiple starting points
 
 const SvgGraph: React.FC<{
   width: number
@@ -93,7 +42,7 @@ const SvgGraph: React.FC<{
   viewBox: ViewBox
   mouse: Point | null
 }> = ({ width, height, viewBox, mouse }) => {
-  const layout = svg.map(graph, {
+  const layout = svg.map(graph, starts, {
     width,
     height,
     center: {
@@ -234,23 +183,16 @@ const SvgGraph: React.FC<{
 
 // TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
-// TODO: hover
-// TODO: hover highlight connecting edges
 
 // zoom in -> view box decrease width, height
 // zoome out -> view box increase width, height
 // drag -> move view box x, y
 
-export type Drag = {
+type Drag = {
   startMouseX: number
   startMouseY: number
   startViewBoxX: number
   startViewBoxY: number
-}
-
-export type Point = {
-  x: number
-  y: number
 }
 
 function App() {
@@ -259,6 +201,7 @@ function App() {
   const ref = useRef(null)
   const [drag, setDrag] = useState<Drag | null>(null)
   const [mouse, setMouse] = useState<Point | null>(null)
+  // TODO: remove?
   const [center, setCenter] = useState({
     x: WIDTH / 2,
     y: HEIGHT / 2,

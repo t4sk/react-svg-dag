@@ -1,42 +1,46 @@
 import { Node, Graph } from "./types"
 
 // Node[] -> build graph -> check valid DAG -> organize into levels
-export function build(nodes: Node[]): Graph {
-  let graph: Graph = new Map()
+export function build(nodes: Node[]): { graph: Graph; starts: number[] } {
+  const graph: Graph = new Map()
+  const starts: number[] = []
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]
 
-    for (const v of node.parents) {
-      if (!graph.has(v)) {
-        graph.set(v, new Set())
+    if (node.parents.size == 0) {
+      starts.push(node.id)
+    } else {
+      for (const v of node.parents) {
+        if (!graph.has(v)) {
+          graph.set(v, new Set())
+        }
+        graph.get(v)?.add(node.id)
       }
-      // @ts-ignore
-      graph.get(v).add(node.id)
     }
   }
 
-  return graph
+  return { graph, starts }
+}
+
+type DfsNode = {
+  // parent
+  p: number | null
+  // current vertex
+  v: number
 }
 
 export function dfs(
   graph: Graph,
   start: number,
-  f: (path: number[]) => void,
+  f?: (path: number[]) => void,
 ): boolean {
-  type Node = {
-    // parent
-    p: number | null
-    // current vertex
-    v: number
-  }
-
-  const q: Node[] = [{ p: null, v: start }]
+  const q: DfsNode[] = [{ p: null, v: start }]
   const visited: Set<number> = new Set()
   const path: number[] = []
 
   while (q.length > 0) {
-    const { p, v } = q.pop() as Node
+    const { p, v } = q.pop() as DfsNode
 
     // Cycle detected - invalid DAG
     if (visited.has(v)) {
@@ -59,7 +63,9 @@ export function dfs(
       }
     } else {
       // Return new copy of path
-      f([...path])
+      if (f) {
+        f([...path])
+      }
     }
   }
 
@@ -70,7 +76,7 @@ export function dfs(
 export function bfs(
   graph: Graph,
   start: number,
-  f: (i: number, vs: number[]) => void,
+  f?: (i: number, vs: number[]) => void,
 ) {
   const q: number[][] = [[start]]
   const visited: Set<number> = new Set()
@@ -79,7 +85,9 @@ export function bfs(
   while (q.length > 0) {
     const vs = q.pop() as number[]
 
-    f(i, [...vs])
+    if (f) {
+      f(i, [...vs])
+    }
 
     const row: Set<number> = new Set()
     for (const v of vs) {
@@ -105,21 +113,28 @@ export function bfs(
   }
 }
 
-export function group(graph: Graph, start: number): number[][] {
-  const rows: number[][] = []
+export function group(graph: Graph, starts: number[]): number[][] {
+  const rows: Set<number>[] = []
 
-  bfs(graph, start, (_, vs) => {
-    rows.push(vs)
-  })
+  for (const s of starts) {
+    let i = 0
+    bfs(graph, s, (_, vs) => {
+      if (i == rows.length) {
+        rows.push(new Set())
+      }
+      for (const v of vs) {
+        rows[i].add(v)
+      }
+      i++
+    })
+  }
 
   const vs: number[][] = []
   const inserted: Set<number> = new Set()
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i]
+  for (const row of rows) {
     const r = []
-    for (let j = 0; j < row.length; j++) {
-      const v = row[j]
+    for (const v of row) {
       if (inserted.has(v)) {
         continue
       }
