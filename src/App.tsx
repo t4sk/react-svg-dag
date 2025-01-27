@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Node, ViewBox, Point } from "./lib/types"
+import { Node, ViewBox, Point, SvgNode } from "./lib/types"
 import { assert } from "./lib/utils"
 import * as svg from "./lib/svg"
 import * as dag from "./lib/dag"
@@ -33,15 +33,31 @@ for (const s of starts) {
   assert(dag.dfs(graph, s), `invalid DAG starting from ${s}`)
 }
 
-// TODO: renderNode props
-// TODO: color props - rect, lines,
+const ARC_X_PADDING = 20
+
 const SvgGraph: React.FC<{
   backgroundColor: string
   width: number
   height: number
   viewBox: ViewBox
   mouse: Point | null
-}> = ({ backgroundColor, width, height, viewBox, mouse }) => {
+  rectFill?: string
+  rectStroke?: string
+  lineColor?: string
+  lineHoverColor?: string
+  renderNode: (node: SvgNode) => React.ReactNode
+}> = ({
+  backgroundColor,
+  width,
+  height,
+  viewBox,
+  mouse,
+  rectFill = "none",
+  rectStroke = "black",
+  lineColor = "black",
+  lineHoverColor = "red",
+  renderNode,
+}) => {
   const layout = svg.map(graph, starts, {
     width,
     height,
@@ -64,13 +80,13 @@ const SvgGraph: React.FC<{
     : 0
 
   let hover = null
-  if (svgX != 0 && svgY != 0) {
+  if (mouse && svgX != 0 && svgY != 0) {
     const i = (svg.bsearch(layout.ys, (y) => y, svgY) || 0) >> 1
     const xs = layout.xs[i]
     if (xs) {
       const j = (svg.bsearch(xs, (x) => x, svgX) || 0) >> 1
       const node = layout.nodes[i][j]
-      if (node) {
+      if (node && svg.isInside({ x: svgX, y: svgY }, node.rect)) {
         hover = node.id
       }
     }
@@ -94,6 +110,8 @@ const SvgGraph: React.FC<{
             y={node.rect.y}
             width={node.rect.width}
             height={node.rect.height}
+            fill={rectFill}
+            stroke={rectStroke}
           />
         ))
       })}
@@ -103,24 +121,28 @@ const SvgGraph: React.FC<{
             return (
               <SvgCubicBezierArc
                 key={i}
-                x0={a.start.x + 20}
+                x0={a.start.x + ARC_X_PADDING}
                 y0={a.start.y}
-                x1={a.end.x - 20}
+                x1={a.end.x - ARC_X_PADDING}
                 y1={a.end.y}
                 t={0.1}
-                color={a.s == hover || a.e == hover ? "red" : "black"}
+                color={
+                  a.s == hover || a.e == hover ? lineHoverColor : lineColor
+                }
               />
             )
           } else {
             return (
               <SvgCubicBezierArc
                 key={i}
-                x0={a.start.x - 20}
+                x0={a.start.x - ARC_X_PADDING}
                 y0={a.start.y}
-                x1={a.end.x + 20}
+                x1={a.end.x + ARC_X_PADDING}
                 y1={a.end.y}
                 t={0.1}
-                color={a.s == hover || a.e == hover ? "red" : "black"}
+                color={
+                  a.s == hover || a.e == hover ? lineHoverColor : lineColor
+                }
               />
             )
           }
@@ -133,7 +155,7 @@ const SvgGraph: React.FC<{
             x1={a.end.x}
             y1={a.end.y}
             t={0.2}
-            color={a.s == hover || a.e == hover ? "red" : "black"}
+            color={a.s == hover || a.e == hover ? lineHoverColor : lineColor}
           />
         )
       })}
@@ -155,13 +177,9 @@ const SvgGraph: React.FC<{
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                color: "white",
-                textAlign: "center",
               }}
             >
-              <a href="/" style={{ color: "white" }}>
-                {cards[node.id - 1]}
-              </a>
+              {renderNode(node)}
             </div>
           </foreignObject>
         ))
@@ -174,6 +192,7 @@ const SvgGraph: React.FC<{
 
 // TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
+// TODO: pretty controller
 
 // Zoom in -> view box decrease width and height
 // Zoom out -> view box increase width and height
@@ -304,6 +323,12 @@ function App() {
         height={height}
         viewBox={viewBox}
         mouse={mouse}
+        rectFill="blue"
+        renderNode={(node) => (
+          <a href="/" style={{ textAlign: "center", color: "white" }}>
+            {cards[node.id - 1]}
+          </a>
+        )}
       />
       {drag ? (
         <div

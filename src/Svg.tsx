@@ -7,7 +7,8 @@ export const SvgRect: React.FC<{
   width: number
   height: number
   fill?: string
-}> = ({ x, y, width, height, fill = "blue" }) => {
+  stroke?: string
+}> = ({ x, y, width, height, fill = "none", stroke = "black" }) => {
   return (
     <rect
       x={x}
@@ -15,7 +16,7 @@ export const SvgRect: React.FC<{
       width={width}
       height={height}
       fill={fill}
-      stroke="black"
+      stroke={stroke}
       strokeWidth="2"
     />
   )
@@ -25,8 +26,9 @@ export const SvgDot: React.FC<{
   x: number
   y: number
   radius: number
-}> = ({ x, y, radius }) => {
-  return <circle cx={x} cy={y} r={radius} fill="red" />
+  fill?: string
+}> = ({ x, y, radius, fill = "red" }) => {
+  return <circle cx={x} cy={y} r={radius} fill={fill} />
 }
 
 export const SvgLine: React.FC<{
@@ -34,8 +36,11 @@ export const SvgLine: React.FC<{
   y0: number
   x1: number
   y1: number
-}> = ({ x0, y0, x1, y1 }) => {
-  return <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="black" strokeWidth="2" />
+  stroke?: string
+}> = ({ x0, y0, x1, y1, stroke }) => {
+  return (
+    <line x1={x0} y1={y0} x2={x1} y2={y1} stroke={stroke} strokeWidth="2" />
+  )
 }
 
 const DY = 10
