@@ -168,7 +168,6 @@ export function isInside(p: Point, rect: Rect): boolean {
   )
 }
 
-// TODO: box layout
 export function map(graph: Graph, starts: number[], canvas: Canvas): Layout {
   const rows = dag.group(graph, starts)
 

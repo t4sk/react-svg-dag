@@ -1,5 +1,4 @@
-import { useRef, useEffect, useState } from "react"
-import styles from "./App.module.css"
+import { useRef, useState } from "react"
 import { Node, ViewBox, Point } from "./lib/types"
 import { assert } from "./lib/utils"
 import * as svg from "./lib/svg"
@@ -17,7 +16,6 @@ const topic_to_id = DATA.reduce((z, d, i) => {
 
 // @ts-ignore
 const nodes: Node[] = DATA.map((d, i) => {
-  console.log(d, i)
   return {
     id: i + 1,
     // @ts-ignore
@@ -27,6 +25,7 @@ const nodes: Node[] = DATA.map((d, i) => {
 
 const cards = DATA.map((d) => d.topic)
 
+// TODO: move to initial checks
 const { graph, starts } = dag.build(nodes)
 
 // Check valid DAG
@@ -34,14 +33,15 @@ for (const s of starts) {
   assert(dag.dfs(graph, s), `invalid DAG starting from ${s}`)
 }
 
-// TODO:  multiple starting points
-
+// TODO: renderNode props
+// TODO: color props - rect, lines,
 const SvgGraph: React.FC<{
+  backgroundColor: string
   width: number
   height: number
   viewBox: ViewBox
   mouse: Point | null
-}> = ({ width, height, viewBox, mouse }) => {
+}> = ({ backgroundColor, width, height, viewBox, mouse }) => {
   const layout = svg.map(graph, starts, {
     width,
     height,
@@ -66,23 +66,13 @@ const SvgGraph: React.FC<{
   let hover = null
   if (svgX != 0 && svgY != 0) {
     const i = (svg.bsearch(layout.ys, (y) => y, svgY) || 0) >> 1
-    // @ts-ignore
-    if (layout.xs[i]) {
-      // @ts-ignore
-      const xs = layout.xs[i]
-      // @ts-ignore
+    const xs = layout.xs[i]
+    if (xs) {
       const j = (svg.bsearch(xs, (x) => x, svgX) || 0) >> 1
-      console.log(
-        "i",
-        i,
-        "j",
-        j,
-        "id",
-        layout.nodes[i][j].id,
-        cards[layout.nodes[i][j].id - 1],
-        svg.isInside({ x: svgX, y: svgY }, layout.nodes[i][j].rect),
-      )
-      hover = layout.nodes[i][j].id
+      const node = layout.nodes[i][j]
+      if (node) {
+        hover = node.id
+      }
     }
   }
 
@@ -91,7 +81,7 @@ const SvgGraph: React.FC<{
       width={width}
       height={height}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      style={{ backgroundColor: "pink" }}
+      style={{ backgroundColor }}
     >
       {svg.iter(layout.mid).map((p, i) => (
         <SvgDot x={p.x} y={p.y} key={i} radius={4} />
@@ -99,7 +89,7 @@ const SvgGraph: React.FC<{
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
           <SvgRect
-            key={j}
+            key={`${i}-${j}`}
             x={node.rect.x}
             y={node.rect.y}
             width={node.rect.width}
@@ -151,6 +141,7 @@ const SvgGraph: React.FC<{
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
           <foreignObject
+            key={`${i}-${j}`}
             x={node.rect.x}
             y={node.rect.y}
             width={node.rect.width}
@@ -184,9 +175,9 @@ const SvgGraph: React.FC<{
 // TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
 
-// zoom in -> view box decrease width, height
-// zoome out -> view box increase width, height
-// drag -> move view box x, y
+// Zoom in -> view box decrease width and height
+// Zoom out -> view box increase width and height
+// Drag -> move view box x, y
 
 type Drag = {
   startMouseX: number
@@ -196,22 +187,24 @@ type Drag = {
 }
 
 function App() {
-  const WIDTH = 600
-  const HEIGHT = 400
-  const ref = useRef(null)
+  const backgroundColor = "pink"
+  const width = 600
+  const height = 400
+
+  const ref = useRef<HTMLDivElement | null>(null)
   const [drag, setDrag] = useState<Drag | null>(null)
   const [mouse, setMouse] = useState<Point | null>(null)
-  // TODO: remove?
-  const [center, setCenter] = useState({
-    x: WIDTH / 2,
-    y: HEIGHT / 2,
-  })
   const [viewBox, setViewBox] = useState({
     x: 0,
     y: 0,
-    width: WIDTH,
-    height: HEIGHT,
+    width,
+    height,
   })
+
+  const center = {
+    x: width / 2,
+    y: height / 2,
+  }
 
   function onClickPlus() {
     const width = viewBox.width / 1.2
@@ -236,8 +229,7 @@ function App() {
   }
 
   function getMouse(
-    // @ts-ignore
-    ref,
+    ref: HTMLDivElement | null,
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ): Point | null {
     if (!ref) {
@@ -263,19 +255,18 @@ function App() {
       })
     }
   }
+
   function onMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     e.preventDefault()
-    console.log("up")
     setDrag(null)
   }
+
   function onMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     e.preventDefault()
-    // console.log("move", getMouse(ref.current, e))
     const mouse = getMouse(ref.current, e)
     if (mouse) {
       setMouse(mouse)
       if (drag) {
-        // @ts-ignore
         const dx = mouse.x - drag.startMouseX
         const dy = mouse.y - drag.startMouseY
         setViewBox({
@@ -286,32 +277,34 @@ function App() {
       }
     }
   }
+
   function onMouseOut(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     e.preventDefault()
-    console.log("out")
     setDrag(null)
   }
 
-  const percentage = (WIDTH / viewBox.width) * 100
-
-  console.log(viewBox, mouse)
+  const percentage = (width / viewBox.width) * 100
 
   return (
     <div
-      className={styles.svg_container}
       style={{
-        backgroundColor: "white",
+        backgroundColor,
         position: "relative",
-        width: WIDTH,
-        height: HEIGHT,
+        width,
+        height,
       }}
       ref={ref}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
     >
-      <SvgGraph width={WIDTH} height={HEIGHT} viewBox={viewBox} mouse={mouse} />
-      {/* UI */}
+      <SvgGraph
+        backgroundColor={backgroundColor}
+        width={width}
+        height={height}
+        viewBox={viewBox}
+        mouse={mouse}
+      />
       {drag ? (
         <div
           style={{
@@ -319,8 +312,8 @@ function App() {
             position: "absolute",
             top: 0,
             left: 0,
-            width: WIDTH,
-            height: HEIGHT,
+            width,
+            height,
           }}
           onMouseOut={onMouseOut}
         ></div>
