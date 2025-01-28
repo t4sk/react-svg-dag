@@ -1,5 +1,5 @@
 import React from "react"
-import * as math from "./lib/math"
+import * as math from "../lib/math"
 
 export const SvgRect: React.FC<{
   x: number

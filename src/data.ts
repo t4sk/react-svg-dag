@@ -1,154 +1,124 @@
 export const DATA = [
   {
-    topic: "Hello World",
+    path: "whats-new",
+    title: "What's New in Vyper 0.4",
     parents: [],
   },
   {
-    topic: "Basic",
+    path: "hello-world",
+    title: "Hello World",
+    parents: [],
+  },
+  { path: "values", title: "Data Types - Values", parents: ["hello-world"] },
+  {
+    path: "references",
+    title: "Data Types - References",
+    parents: ["hello-world"],
+  },
+  {
+    path: "dynamic-arrays",
+    title: "Dynamic Arrays",
     parents: [],
   },
   {
-    topic: "Data Types - Values",
-    parents: ["Hello World", "Basic"],
+    path: "constructor",
+    title: "Constructor",
+    parents: ["hello-world"],
   },
   {
-    topic: "Data Types - References",
-    parents: ["Hello World"],
+    path: "private-public-state-variables",
+    title: "Private and Public State Variables",
+    parents: ["hello-world"],
   },
   {
-    topic: "Dynamic Arrays",
-    parents: ["Data Types - Values", "Data Types - References"],
+    path: "constants",
+    title: "Constants",
+    parents: ["values"],
   },
   {
-    topic: "Constructor",
-    parents: ["Hello World"],
+    path: "immutable",
+    title: "Immutable",
+    parents: ["constants", "constructor"],
+  },
+  { path: "function", title: "Function", parents: ["hello-world"] },
+  {
+    path: "internal-external-functions",
+    title: "Internal and External Functions",
+    parents: ["function"],
   },
   {
-    topic: "Private and Public State Variables",
-    parents: ["Hello World", "Data Types - Values"],
+    path: "view-pure-functions",
+    title: "View and Pure Functions",
+    parents: ["function"],
   },
   {
-    topic: "Constants",
-    parents: ["Private and Public State Variables"],
+    path: "if-else",
+    title: "If Else",
+    parents: ["hello-world"],
+  },
+  { path: "for-loop", title: "For Loop", parents: ["hello-world"] },
+  { path: "error", title: "Error", parents: ["hello-world"] },
+  { path: "event", title: "Event", parents: ["hello-world"] },
+  { path: "payable", title: "Payable", parents: ["function"] },
+  {
+    path: "default-function",
+    title: "Default Function",
+    parents: ["function", "payable"],
   },
   {
-    topic: "Immutable",
-    parents: ["Private and Public State Variables"],
+    path: "send-ether",
+    title: "Send Ether",
+    parents: ["default-function", "function"],
+  },
+  { path: "interface", title: "Interface", parents: ["function"] },
+  { path: "raw-call", title: "Raw Call", parents: ["function", "interface"] },
+  { path: "delegate-call", title: "Delegate Call", parents: ["raw-call"] },
+  { path: "hash-function", title: "Hash Function", parents: ["function"] },
+  {
+    path: "verify-signature",
+    title: "Verify Signature",
+    parents: ["function"],
   },
   {
-    topic: "Function",
-    parents: ["Hello World"],
+    path: "re-entrancy-lock",
+    title: "Re-entrancy Lock",
+    parents: ["function"],
   },
   {
-    topic: "Internal and External Functions",
-    parents: ["Function"],
+    path: "create-new-contract",
+    title: "Create New Contract",
+    parents: ["constructor"],
+  },
+  { path: "self-destruct", title: "Self Destruct", parents: ["function"] },
+  { path: "imports", title: "Imports", parents: ["hello-world"] },
+  { path: "modules", title: "Modules", parents: ["hello-world"] },
+  { path: "unsafe-math", title: "Unsafe Math", parents: ["function"] },
+  { path: "print", title: "Debug with Print", parents: ["hello-world"] },
+  // app
+  {
+    path: "app/rebase-token",
+    title: "Rebase Token",
+    parents: ["function"],
   },
   {
-    topic: "View and Pure Functions",
-    parents: ["Function"],
+    path: "app/lerp",
+    title: "Linear Interpolation",
+    parents: ["function"],
   },
   {
-    topic: "If Else",
-    parents: ["Function"],
+    path: "app/multi-sig-wallet",
+    title: "Multi Sig Wallet",
+    parents: ["function"],
+  },
+  // defi
+  {
+    path: "defi/curve-swap",
+    title: "Curve Swap",
+    parents: ["function"],
   },
   {
-    topic: "For Loop",
-    parents: ["Function"],
-  },
-  {
-    topic: "Error",
-    parents: ["Function"],
-  },
-  {
-    topic: "Event",
-    parents: ["Function"],
-  },
-  {
-    topic: "Payable",
-    parents: ["Function"],
-  },
-  {
-    topic: "Default Function",
-    parents: ["Payable"],
-  },
-  {
-    topic: "Send Ether",
-    parents: ["Payable"],
-  },
-  {
-    topic: "Interface",
-    parents: ["Function"],
-  },
-  {
-    topic: "Raw Call",
-    parents: ["Interface"],
-  },
-  {
-    topic: "Delegate Call",
-    parents: ["Raw Call"],
-  },
-  {
-    topic: "Hash Function",
-    parents: ["Function"],
-  },
-  {
-    topic: "Verify Signature",
-    parents: ["Hash Function"],
-  },
-  {
-    topic: "Re-entrancy Lock",
-    parents: ["Delegate Call"],
-  },
-  {
-    topic: "Create New Contract",
-    parents: ["Function"],
-  },
-  {
-    topic: "Self Destruct",
-    parents: ["Create New Contract"],
-  },
-  {
-    topic: "Imports",
-    parents: ["Hello World"],
-  },
-  {
-    topic: "Modules",
-    parents: ["Imports"],
-  },
-  {
-    topic: "Unsafe Math",
-    parents: ["Function"],
-  },
-  {
-    topic: "Debug with Print",
-    parents: ["Function"],
-  },
-  {
-    topic: "App",
-    parents: ["Modules"],
-  },
-  {
-    topic: "Rebase Token",
-    parents: ["App"],
-  },
-  {
-    topic: "Linear Interpolation",
-    parents: ["App"],
-  },
-  {
-    topic: "Multi Sig Wallet",
-    parents: ["App"],
-  },
-  {
-    topic: "DeFi",
-    parents: ["App"],
-  },
-  {
-    topic: "Curve Swap",
-    parents: ["DeFi"],
-  },
-  {
-    topic: "Curve Add and Remove Liquidity",
-    parents: ["DeFi"],
+    path: "defi/curve-liquidity",
+    title: "Curve Add and Remove Liquidity",
+    parents: ["function"],
   },
 ]

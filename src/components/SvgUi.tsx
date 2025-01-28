@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
-import { ViewBox, Point, SvgNode, Graph } from "./lib/types"
-import * as svg from "./lib/svg"
+import { ViewBox, Point, SvgNode, Graph } from "../lib/types"
+import * as svg from "../lib/svg"
 import { SvgRect, SvgDot, SvgCubicBezier, SvgCubicBezierArc } from "./Svg"
 import { Controller } from "./Controller"
 
@@ -178,6 +178,7 @@ export const SvgGraph: React.FC<{
 // TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
 // TODO: pretty controller
+// TODO: center button for controller
 
 // Zoom in -> view box decrease width and height
 // Zoom out -> view box increase width and height

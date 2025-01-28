@@ -1,13 +1,13 @@
 import { Node } from "./lib/types"
 import { assert } from "./lib/utils"
 import * as dag from "./lib/dag"
-import { SvgUi } from "./SvgUi"
+import { SvgUi } from "./components/SvgUi"
 
 import { DATA } from "./data"
 
 const topic_to_id = DATA.reduce((z, d, i) => {
   // @ts-ignore
-  z[d.topic] = i + 1
+  z[d.path] = i + 1
   return z
 }, {})
 
@@ -20,9 +20,8 @@ const nodes: Node[] = DATA.map((d, i) => {
   }
 })
 
-const cards = DATA.map((d) => d.topic)
+const cards = DATA.map((d) => d.title)
 
-// TODO: move to initial checks
 const { graph, starts } = dag.build(nodes)
 
 // Check valid DAG
