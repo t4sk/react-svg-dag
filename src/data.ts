@@ -18,12 +18,12 @@ export const DATA = [
   {
     path: "dynamic-arrays",
     title: "Dynamic Arrays",
-    parents: [],
+    parents: ["values"],
   },
   {
     path: "constructor",
     title: "Constructor",
-    parents: ["hello-world"],
+    parents: ["function"],
   },
   {
     path: "private-public-state-variables",
@@ -63,21 +63,21 @@ export const DATA = [
   {
     path: "default-function",
     title: "Default Function",
-    parents: ["function", "payable"],
+    parents: ["send-ether"],
   },
   {
     path: "send-ether",
     title: "Send Ether",
-    parents: ["default-function", "function"],
+    parents: ["payable"],
   },
   { path: "interface", title: "Interface", parents: ["function"] },
-  { path: "raw-call", title: "Raw Call", parents: ["function", "interface"] },
+  { path: "raw-call", title: "Raw Call", parents: ["interface"] },
   { path: "delegate-call", title: "Delegate Call", parents: ["raw-call"] },
   { path: "hash-function", title: "Hash Function", parents: ["function"] },
   {
     path: "verify-signature",
     title: "Verify Signature",
-    parents: ["function"],
+    parents: ["hash-function"],
   },
   {
     path: "re-entrancy-lock",
@@ -91,7 +91,7 @@ export const DATA = [
   },
   { path: "self-destruct", title: "Self Destruct", parents: ["function"] },
   { path: "imports", title: "Imports", parents: ["hello-world"] },
-  { path: "modules", title: "Modules", parents: ["hello-world"] },
+  { path: "modules", title: "Modules", parents: ["imports"] },
   { path: "unsafe-math", title: "Unsafe Math", parents: ["function"] },
   { path: "print", title: "Debug with Print", parents: ["hello-world"] },
   // app
@@ -108,17 +108,17 @@ export const DATA = [
   {
     path: "app/multi-sig-wallet",
     title: "Multi Sig Wallet",
-    parents: ["function"],
+    parents: ["raw-call"],
   },
   // defi
   {
     path: "defi/curve-swap",
     title: "Curve Swap",
-    parents: ["function"],
+    parents: ["interface"],
   },
   {
     path: "defi/curve-liquidity",
     title: "Curve Add and Remove Liquidity",
-    parents: ["function"],
+    parents: ["interface"],
   },
 ]
