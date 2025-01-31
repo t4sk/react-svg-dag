@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { ViewBox, Point, SvgNode, Graph } from "../lib/types"
 import * as svg from "../lib/svg"
+import styles from "./SvgUi.module.css"
 import { SvgRect, SvgDot, SvgCubicBezier, SvgCubicBezierArc } from "./Svg"
 import { Controller } from "./Controller"
 
@@ -83,9 +84,6 @@ export const SvgGraph: React.FC<{
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       style={{ backgroundColor }}
     >
-      {svg.iter(layout.mid).map((p, i) => (
-        <SvgDot x={p.x} y={p.y} key={i} radius={4} />
-      ))}
       {layout.nodes.map((row, i) => {
         return row.map((node, j) => (
           <SvgRect
@@ -174,15 +172,14 @@ export const SvgGraph: React.FC<{
   )
 }
 
-// TODO: zoom to current center
-// TODO: zoom - linear zoom
 // TODO: layout nodes by "nearest" distance
-// TODO: pretty controller
-// TODO: center button for controller
 
-// Zoom in -> view box decrease width and height
-// Zoom out -> view box increase width and height
-// Drag -> move view box x, y
+const ZOOMS: number[] = [
+  0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
+  1.7, 1.8, 1.9, 2.0,
+]
+const MIN_ZOOM_INDEX = 0
+const MAX_ZOOM_INDEX = ZOOMS.length - 1
 
 export type Drag = {
   startMouseX: number
@@ -231,31 +228,38 @@ export const SvgUi: React.FC<{
     width,
     height,
   })
+  const [zoomIndex, setZoomIndex] = useState<number>(9)
 
   const center = {
-    x: width / 2,
-    y: height / 2,
+    x: viewBox.x + viewBox.width / 2,
+    y: viewBox.y + viewBox.height / 2,
   }
 
   function onClickPlus() {
-    const width = viewBox.width / 1.2
-    const height = viewBox.height / 1.2
+    // Zoom in -> view box decrease width and height
+    const nextZoomIndex = Math.min(zoomIndex + 1, MAX_ZOOM_INDEX)
+    const w = Math.floor(width / ZOOMS[nextZoomIndex])
+    const h = Math.floor(height / ZOOMS[nextZoomIndex])
+    setZoomIndex(nextZoomIndex)
     setViewBox({
-      x: center.x - width / 2,
-      y: center.y - height / 2,
-      width,
-      height,
+      x: center.x - w / 2,
+      y: center.y - h / 2,
+      width: w,
+      height: h,
     })
   }
 
   function onClickMinus() {
-    const width = viewBox.width * 1.2
-    const height = viewBox.height * 1.2
+    // Zoom out -> view box increase width and height
+    const nextZoomIndex = Math.max(zoomIndex - 1, MIN_ZOOM_INDEX)
+    const w = Math.floor(width / ZOOMS[nextZoomIndex])
+    const h = Math.floor(height / ZOOMS[nextZoomIndex])
+    setZoomIndex(nextZoomIndex)
     setViewBox({
-      x: center.x - width / 2,
-      y: center.y - height / 2,
-      width,
-      height,
+      x: center.x - w / 2,
+      y: center.y - h / 2,
+      width: w,
+      height: h,
     })
   }
 
@@ -314,7 +318,7 @@ export const SvgUi: React.FC<{
     setDrag(null)
   }
 
-  const percentage = (width / viewBox.width) * 100
+  const percentage = Math.floor((width / viewBox.width) * 100)
 
   return (
     <div
@@ -361,7 +365,7 @@ export const SvgUi: React.FC<{
           onMouseOut={onMouseOut}
         ></div>
       ) : null}
-      <div style={{ position: "absolute", bottom: 0, left: 0 }}>
+      <div className={styles.controller}>
         <Controller
           onClickPlus={onClickPlus}
           onClickMinus={onClickMinus}

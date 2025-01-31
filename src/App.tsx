@@ -36,7 +36,7 @@ function App() {
       starts={starts}
       backgroundColor="pink"
       width={600}
-      height={800}
+      height={500}
       rectFill="blue"
       renderNode={(node) => (
         <a href="/" style={{ textAlign: "center", color: "white" }}>
