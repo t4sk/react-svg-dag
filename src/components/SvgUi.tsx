@@ -47,8 +47,8 @@ export const SvgGraph: React.FC<{
     width,
     height,
     center: {
-      x: width / 2,
-      y: height / 2,
+      x: width >> 1,
+      y: height >> 1,
     },
     node: {
       width: nodeWidth,
@@ -231,8 +231,8 @@ export const SvgUi: React.FC<{
   const [zoomIndex, setZoomIndex] = useState<number>(9)
 
   const center = {
-    x: viewBox.x + viewBox.width / 2,
-    y: viewBox.y + viewBox.height / 2,
+    x: viewBox.x + (viewBox.width >> 1),
+    y: viewBox.y + (viewBox.height >> 1),
   }
 
   function onClickPlus() {
@@ -242,8 +242,8 @@ export const SvgUi: React.FC<{
     const h = Math.floor(height / ZOOMS[nextZoomIndex])
     setZoomIndex(nextZoomIndex)
     setViewBox({
-      x: center.x - w / 2,
-      y: center.y - h / 2,
+      x: center.x - (w >> 1),
+      y: center.y - (h >> 1),
       width: w,
       height: h,
     })
@@ -256,8 +256,8 @@ export const SvgUi: React.FC<{
     const h = Math.floor(height / ZOOMS[nextZoomIndex])
     setZoomIndex(nextZoomIndex)
     setViewBox({
-      x: center.x - w / 2,
-      y: center.y - h / 2,
+      x: center.x - (w >> 1),
+      y: center.y - (h >> 1),
       width: w,
       height: h,
     })
