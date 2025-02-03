@@ -116,6 +116,7 @@ export function bfs(
 export function group(graph: Graph, starts: number[]): number[][] {
   const rows: Set<number>[] = []
 
+  // BFS from each starting point
   for (const s of starts) {
     let i = 0
     bfs(graph, s, (_, vs) => {

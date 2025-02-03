@@ -66,9 +66,11 @@ export const SvgGraph: React.FC<{
 
   let hover = null
   if (mouse && svgX != 0 && svgY != 0) {
+    // Binary search y
     const i = (svg.bsearch(layout.ys, (y) => y, svgY) || 0) >> 1
     const xs = layout.xs[i]
     if (xs) {
+      // Binary search x
       const j = (svg.bsearch(xs, (x) => x, svgX) || 0) >> 1
       const node = layout.nodes[i][j]
       if (node && svg.isInside({ x: svgX, y: svgY }, node.rect)) {

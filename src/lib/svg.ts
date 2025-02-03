@@ -118,7 +118,7 @@ export function iter(mids: {
   return [top, left, bottom, right, center]
 }
 
-export function box(canvas: Canvas, n: number, p0: Point): Rect {
+function box(canvas: Canvas, n: number, p0: Point): Rect {
   const height = canvas.node.height
   const width = n * canvas.node.width + (n - 1) * canvas.node.gap
 
@@ -171,10 +171,12 @@ export function isInside(p: Point, rect: Rect): boolean {
 export function map(graph: Graph, starts: number[], canvas: Canvas): Layout {
   const rows = dag.group(graph, starts)
 
+  // Height of the graph
   const height =
     rows.length * canvas.node.height + (rows.length - 1) * canvas.node.gap
   const y0 = canvas.center.y - (height >> 1)
 
+  // Bounding boxes around each row
   const boxes = rows.map((r, i) =>
     box(canvas, r.length, {
       x: canvas.center.x,
