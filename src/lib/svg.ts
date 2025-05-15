@@ -187,17 +187,6 @@ export function map(graph: Graph, starts: number[], canvas: Canvas): Layout {
     }),
   )
 
-  const width = Math.max(...boxes.map((b) => b.width))
-
-  const rect = {
-    x: canvas.center.x - (width >> 1),
-    y: canvas.center.y - (height >> 1),
-    width,
-    height,
-  }
-
-  const mid = getMidPoints(rect)
-
   const nodes: SvgNode[][] = []
   const map: Map<number, SvgNode> = new Map()
   const xs: number[][] = []
@@ -242,6 +231,17 @@ export function map(graph: Graph, starts: number[], canvas: Canvas): Layout {
       }
     }
   }
+
+  const width = Math.max(...boxes.map((b) => b.width))
+
+  const rect = {
+    x: canvas.center.x - (width >> 1),
+    y: canvas.center.y - (height >> 1),
+    width,
+    height,
+  }
+
+  const mid = getMidPoints(rect)
 
   return {
     rect,
