@@ -33,14 +33,17 @@ type DfsNode = {
 export function dfs(
   graph: Graph,
   start: number,
-  f?: (path: number[]) => void,
+  f?: (d: number, v: number) => void,
 ): boolean {
-  const q: DfsNode[] = [{ p: null, v: start }]
+  type Node = {p: number | null; v: number }
+
+  const q: Node[] = [{ p: null, v: start }]
   const visited: Set<number> = new Set()
   const path: number[] = []
 
   while (q.length > 0) {
-    const { p, v } = q.pop() as DfsNode
+    // Avoid using shift() which is O(N) to get element from the head of q
+    const { p, v } = q.pop() as Node
 
     // Cycle detected - invalid DAG
     if (visited.has(v)) {
@@ -56,15 +59,15 @@ export function dfs(
     visited.add(v)
     path.push(v)
 
-    const next = graph.get(v)
-    if (next) {
-      for (const w of next) {
+    if (f) {
+      f(path.length - 1, v)
+    }
+
+
+    const neighbors = graph.get(v)
+    if (neighbors) {
+      for (const w of [...neighbors].reverse()) {
         q.push({ p: v, v: w })
-      }
-    } else {
-      // Return new copy of path
-      if (f) {
-        f([...path])
       }
     }
   }
@@ -76,40 +79,33 @@ export function dfs(
 export function bfs(
   graph: Graph,
   start: number,
-  f?: (i: number, vs: number[]) => void,
+  f?: (d: number, v: number) => void,
 ) {
-  const q: number[][] = [[start]]
+  const q: [number, number][] = [[0, start]]
   const visited: Set<number> = new Set()
-
   let i = 0
-  while (q.length > 0) {
-    const vs = q.pop() as number[]
+
+  while (i < q.length) {
+    // Avoid using shift() which is O(N) to get element from the head of q
+    const [d, v] = q[i++]
+
+    if (visited.has(v)) {
+      continue
+    }
+    visited.add(v)
 
     if (f) {
-      f(i, [...vs])
+      f(d, v)
     }
 
-    const row: Set<number> = new Set()
-    for (const v of vs) {
-      if (visited.has(v)) {
-        continue
-      }
-      visited.add(v)
-
-      const next = graph.get(v)
-      if (next) {
-        for (const w of next) {
-          if (!visited.has(w)) {
-            row.add(w)
-          }
+    const neighbors = graph.get(v)
+    if (neighbors) {
+      for (const w of neighbors) {
+        if (!visited.has(w)) {
+          q.push([d + 1, w])
         }
       }
     }
-
-    if (row.size > 0) {
-      q.push([...row])
-    }
-    i++
   }
 }
 
@@ -118,15 +114,11 @@ export function group(graph: Graph, starts: number[]): number[][] {
 
   // BFS from each starting point
   for (const s of starts) {
-    let i = 0
-    bfs(graph, s, (_, vs) => {
-      if (i == rows.length) {
+    bfs(graph, s, (d, v) => {
+      if (d == rows.length) {
         rows.push(new Set())
       }
-      for (const v of vs) {
-        rows[i].add(v)
-      }
-      i++
+      rows[d].add(v)
     })
   }
 

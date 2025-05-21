@@ -26,7 +26,7 @@ const { graph, starts } = dag.build(nodes)
 
 // Check valid DAG
 for (const s of starts) {
-  assert(dag.dfs(graph, s), `invalid DAG starting from ${s}`)
+  assert(dag.dfs(graph, s, (d, v) => console.log([d, v], DATA[v - 1].title)), `invalid DAG starting from ${s}`)
 }
 
 function App() {
